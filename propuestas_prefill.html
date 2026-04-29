@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Propuestas — Apprecio</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #F5F5F7; color: #1B1B1B; min-height: 100vh; }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+.header { margin-bottom: 2.5rem; }
+.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #FA345E; margin-bottom: 0.6rem; }
+.title { font-size: 32px; font-weight: 600; color: #1B1B1B; line-height: 1.1; margin-bottom: 0.4rem; }
+.title span { color: #FA345E; }
+.subtitle { font-size: 13px; color: #6B6B6B; }
+
+.stepper { display: flex; align-items: center; margin-bottom: 2rem; gap: 0; }
+.s-item { display: flex; align-items: center; gap: 7px; }
+.s-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; transition: all 0.2s; }
+.s-num.active { background: #FA345E; color: #fff; }
+.s-num.done { background: #FA345E; color: #fff; font-size: 10px; }
+.s-num.pending { background: #E8E8ED; color: #999; }
+.s-label { font-size: 12px; color: #999; white-space: nowrap; }
+.s-label.active { color: #1B1B1B; font-weight: 600; }
+.s-conn { flex: 1; height: 1px; background: #E0E0E5; min-width: 12px; }
+
+.card { background: #fff; border: 0.5px solid #E0E0E5; border-radius: 14px; padding: 2rem; }
+
+.step-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #FA345E; margin-bottom: 1.25rem; }
+
+.field { margin-bottom: 1.1rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem; }
+label { display: block; font-size: 13px; font-weight: 500; color: #1B1B1B; margin-bottom: 5px; }
+label .hint { font-weight: 400; color: #999; font-size: 11px; margin-left: 3px; }
+input[type=text], input[type=email], select, textarea {
+  width: 100%; padding: 9px 12px; font-size: 13px; font-family: inherit;
+  background: #F5F5F7; border: 0.5px solid #E0E0E5;
+  border-radius: 8px; color: #1B1B1B; outline: none; transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: #FA345E; box-shadow: 0 0 0 3px rgba(250,52,94,0.08); }
+textarea { resize: vertical; min-height: 72px; }
+
+.prod-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+.prod-card { border: 1px solid #E0E0E5; border-radius: 12px; padding: 1rem 1.1rem; cursor: pointer; transition: all 0.15s; background: #F5F5F7; user-select: none; }
+.prod-card:hover { border-color: #FA345E; }
+.prod-card.sel { border-color: #FA345E; background: rgba(250,52,94,0.04); }
+.prod-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; font-weight: 500; }
+.prod-badge.teams { background: rgba(250,52,94,0.1); color: #FA345E; }
+.prod-badge.perf { background: rgba(20,103,135,0.1); color: #146787; }
+.prod-name { font-size: 14px; font-weight: 600; color: #1B1B1B; margin-bottom: 4px; }
+.prod-desc { font-size: 11px; color: #6B6B6B; line-height: 1.5; }
+
+.check-g { display: flex; flex-wrap: wrap; gap: 6px; }
+.c-item { display: flex; align-items: center; gap: 6px; padding: 7px 11px; border: 0.5px solid #E0E0E5; border-radius: 8px; cursor: pointer; font-size: 12px; color: #1B1B1B; background: #F5F5F7; transition: all 0.15s; user-select: none; }
+.c-item:hover { border-color: #FA345E; }
+.c-item.sel { border-color: #FA345E; background: rgba(250,52,94,0.06); }
+.c-box { width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.c-item.sel .c-box { border-color: #FA345E; background: #FA345E; }
+.c-check { width: 7px; height: 7px; display: none; }
+.c-item.sel .c-check { display: block; }
+
+.radio-g { display: flex; flex-direction: column; gap: 5px; }
+.r-item { display: flex; align-items: flex-start; gap: 8px; padding: 9px 12px; border: 0.5px solid #E0E0E5; border-radius: 8px; cursor: pointer; font-size: 13px; color: #1B1B1B; background: #F5F5F7; transition: all 0.15s; user-select: none; line-height: 1.4; }
+.r-item:hover { border-color: #FA345E; }
+.r-item.sel { border-color: #FA345E; background: rgba(250,52,94,0.06); }
+.r-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #ccc; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; }
+.r-item.sel .r-dot { border-color: #FA345E; background: #FA345E; }
+.r-dot-i { width: 5px; height: 5px; border-radius: 50%; background: #fff; display: none; }
+.r-item.sel .r-dot-i { display: block; }
+.r-sub { font-size: 11px; color: #999; margin-top: 1px; display: block; }
+
+.sep { height: 0.5px; background: #E0E0E5; margin: 1.25rem 0; }
+.info-box { background: #F5F5F7; border-left: 2px solid #FA345E; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; font-size: 12px; color: #6B6B6B; line-height: 1.5; margin-bottom: 1.25rem; }
+
+.footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 0.5px solid #E0E0E5; }
+.btn-back { padding: 9px 20px; font-size: 13px; font-family: inherit; background: transparent; border: 0.5px solid #ccc; border-radius: 8px; color: #6B6B6B; cursor: pointer; transition: all 0.15s; }
+.btn-back:hover { background: #F5F5F7; color: #1B1B1B; }
+.btn-next { padding: 10px 26px; font-size: 13px; font-family: inherit; background: #FA345E; border: none; border-radius: 8px; color: #fff; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+.btn-next:hover { background: #D42A4F; }
+.btn-next:active { transform: scale(0.98); }
+.prog { font-size: 11px; color: #999; }
+
+.rev-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 0.5px solid #E0E0E5; font-size: 13px; }
+.rev-row:last-child { border-bottom: none; }
+.rev-k { color: #6B6B6B; }
+.rev-v { color: #1B1B1B; font-weight: 500; text-align: right; max-width: 58%; }
+
+.ok-wrap { text-align: center; padding: 2.5rem 1.5rem; }
+.ok-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(250,52,94,0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
+.ok-icon svg { width: 24px; height: 24px; stroke: #FA345E; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ok-title { font-size: 22px; font-weight: 600; color: #1B1B1B; margin-bottom: 0.4rem; }
+.ok-sub { font-size: 13px; color: #6B6B6B; max-width: 340px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.ok-detail { background: #F5F5F7; border-radius: 10px; padding: 1rem 1.25rem; font-size: 12px; color: #6B6B6B; line-height: 1.9; max-width: 320px; margin: 0 auto 1.5rem; text-align: left; }
+.pricing-link { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; background: transparent; border: 1px solid #FA345E; border-radius: 8px; color: #FA345E; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+.pricing-link:hover { background: rgba(250,52,94,0.06); }
+
+.hidden { display: none; }
+
+@media (max-width: 560px) {
+  .row2 { grid-template-columns: 1fr; }
+  .prod-switch { grid-template-columns: 1fr; }
+  .s-label { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="eyebrow">Apprecio · Herramienta comercial</div>
+    <div class="title">Generador de propuestas<span>.</span></div>
+    <div class="subtitle">Completa los datos para generar una propuesta personalizada automáticamente.</div>
+  </div>
+
+  <div class="stepper">
+    <div class="s-item"><div class="s-num active" id="sn1">1</div><span class="s-label active" id="sl1">Producto</span></div>
+    <div class="s-conn"></div>
+    <div class="s-item"><div class="s-num pending" id="sn2">2</div><span class="s-label" id="sl2">Cliente</span></div>
+    <div class="s-conn"></div>
+    <div class="s-item"><div class="s-num pending" id="sn3">3</div><span class="s-label" id="sl3">Programa</span></div>
+    <div class="s-conn"></div>
+    <div class="s-item"><div class="s-num pending" id="sn4">4</div><span class="s-label" id="sl4">Calificación</span></div>
+    <div class="s-conn"></div>
+    <div class="s-item"><div class="s-num pending" id="sn5">5</div><span class="s-label" id="sl5">Confirmar</span></div>
+  </div>
+
+  <div class="card">
+
+    <!-- PASO 1: PRODUCTO -->
+    <div id="step1">
+      <div class="step-tag">Paso 1 — Producto y cobertura</div>
+      <div class="field" style="margin-bottom:0.75rem;"><label>¿Para qué producto es la propuesta?</label></div>
+      <div class="prod-switch">
+        <div class="prod-card sel" id="prod_teams" onclick="selectProd('teams')">
+          <div class="prod-badge teams">Cultura y reconocimiento</div>
+          <div class="prod-name">Apprecio Teams</div>
+          <div class="prod-desc">Activa la cultura organizacional desde el día a día: reconocimiento, objetivos, recompensas, encuestas y analytics.</div>
+        </div>
+        <div class="prod-card" id="prod_perf" onclick="selectProd('performance')">
+          <div class="prod-badge perf">Desempeño e incentivos</div>
+          <div class="prod-name">Apprecio Performance</div>
+          <div class="prod-desc">Gestiona metas comerciales, incentivos variables y rankings de desempeño para equipos de ventas y operaciones.</div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="field">
+        <label>¿En qué países opera el cliente?</label>
+        <div class="check-g" id="paises_check">
+          <div class="c-item sel" data-val="Chile" onclick="toggleCheck(this)"><div class="c-box"><svg class="c-check" viewBox="0 0 8 8" fill="none"><polyline points="1,4 3,6 7,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>Chile</div>
+          <div class="c-item" data-val="Perú" onclick="toggleCheck(this)"><div class="c-box"><svg class="c-check" viewBox="0 0 8 8" fill="none"><polyline points="1,4 3,6 7,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>Perú</div>
+          <div class="c-item" data-val="Colombia" onclick="toggleCheck(this)"><div class="c-box"><svg class="c-check" viewBox="0 0 8 8" fill="none"><polyline points="1,4 3,6 7,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>Colombia</div>
+          <div class="c-item" data-val="México" onclick="toggleCheck(this)"><div class="c-box"><svg class="c-check" viewBox="0 0 8 8" fill="none"><polyline points="1,4 3,6 7,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>México</div>
+          <div class="c-item" data-val="España" onclick="toggleCheck(this)"><div class="c-box"><svg class="c-check" viewBox="0 0 8 8" fill="none"><polyline points="1,4 3,6 7,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>España</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2: CLIENTE -->
+    <div id="step2" class="hidden">
+      <div class="step-tag">Paso 2 — Datos del cliente</div>
+      <div class="row2">
+        <div class="field"><label>Nombre de la empresa</label><input type="text" id="empresa" placeholder="Falabella S.A."></div>
+        <div class="field"><label>Página web</label><input type="text" id="web" placeholder="www.empresa.com"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Nombre KAM</label><input type="text" id="kam_nombre" placeholder="Felipe Torres"></div>
+        <div class="field"><label>Correo KAM</label><input type="email" id="kam_correo" placeholder="felipe@apprecio.com"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Contacto del cliente</label><input type="text" id="contacto" placeholder="María González, CHRO"></div>
+        <div class="field"><label>Correo del cliente</label><input type="email" id="correo_cliente" placeholder="maria@empresa.com"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Industria</label>
+          <select id="industria">
+            <option value="">Selecciona...</option>
+            <option>Retail</option>
+            <option>Banca y Finanzas</option>
+            <option>Salud y Farma</option>
+            <option>Manufactura e Industria</option>
+            <option>Tecnología</option>
+            <option>Logística y Transporte</option>
+            <option>Educación</option>
+            <option>Telecomunicaciones</option>
+            <option>Construcción e Inmobiliaria</option>
+            <option>Seguros</option>
+            <option>Consumo masivo / FMCG</option>
+            <option>Servicios profesionales</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>N° de colaboradores</label>
+          <select id="colaboradores">
+            <option value="">Selecciona...</option>
+            <option value="150-499">150 – 499</option>
+            <option value="500-1999">500 – 1.999</option>
+            <option value="2000+">2.000 o más</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Descripción breve <span class="hint">(a qué se dedica, público principal)</span></label><textarea id="descripcion" placeholder="Empresa de retail con presencia en 3 países, equipos de sala y centros de distribución..."></textarea></div>
+      <div class="field">
+        <label>¿Son clientes actuales de Apprecio?</label>
+        <select id="cliente_actual">
+          <option value="No son clientes actuales">No, es cliente nuevo</option>
+          <option value="Sí, área de Incentivos">Sí — área de Incentivos</option>
+          <option value="Sí, área de RRHH">Sí — área de RRHH</option>
+          <option value="Sí, otra área">Sí — otra área</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PASO 3: PROGRAMA -->
+    <div id="step3" class="hidden">
+      <div class="step-tag">Paso 3 — El programa</div>
+      <div class="field">
+        <label>Objetivo principal del programa</label>
+        <textarea id="objetivo" placeholder="Reducir la rotación de vendedores y aumentar el engagement del equipo de sala..."></textarea>
+      </div>
+      <div class="field">
+        <label>¿A quién va dirigido el programa? <span class="hint">(rol foco)</span></label>
+        <div class="radio-g" id="rol_group">
+          <div class="r-item" data-val="Colaboradores en general" onclick="selectR(this,'rol_group')"><div class="r-dot"><div class="r-dot-i"></div></div>Colaboradores en general</div>
+          <div class="r-item" data-val="Fuerza de ventas y comerciales" onclick="selectR(this,'rol_group')"><div class="r-dot"><div class="r-dot-i"></div></div>Fuerza de ventas y comerciales</div>
+          <div class="r-item" data-val="Líderes y jefaturas" onclick="selectR(this,'rol_group')"><div class="r-dot"><div class="r-dot-i"></div></div>Líderes y jefaturas</div>
+          <div class="r-item" data-val="Operaciones y terreno" onclick="selectR(this,'rol_group')"><div class="r-dot"><div class="r-dot-i"></div></div>Operaciones y terreno <span class="r-sub">(bodega, logística, manufactura)</span></div>
+          <div class="r-item" data-val="Área específica" onclick="selectR(this,'rol_group')"><div class="r-dot"><div class="r-dot-i"></div></div>Área específica <span class="r-sub">— detallar en comentarios</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Comentarios del KAM <span class="hint">(contexto, sensibilidades, historia)</span></label>
+        <textarea id="comentarios" placeholder="El cliente tuvo una mala experiencia con otra plataforma. Valoran simplicidad e impacto rápido..."></textarea>
+      </div>
+    </div>
+
+    <!-- PASO 4: CALIFICACIÓN -->
+    <div id="step4" class="hidden">
+      <div class="step-tag">Paso 4 — Calificación de la oportunidad</div>
+      <div class="info-box" id="q_infobox">Estas preguntas nos ayudan a personalizar la propuesta y priorizar el seguimiento comercial.</div>
+
+      <!-- TEAMS -->
+      <div id="q_teams_bloque">
+        <div class="field">
+          <label>¿Cómo describirías el estado actual de la cultura?</label>
+          <div class="radio-g" id="q_cultura">
+            <div class="r-item" data-val="Cultura definida pero sin activación cotidiana" onclick="selectR(this,'q_cultura')"><div class="r-dot"><div class="r-dot-i"></div></div>Tienen valores definidos, pero no se viven en el día a día</div>
+            <div class="r-item" data-val="Alta rotación y bajo engagement" onclick="selectR(this,'q_cultura')"><div class="r-dot"><div class="r-dot-i"></div></div>Enfrentan alta rotación y bajo sentido de pertenencia</div>
+            <div class="r-item" data-val="Equipos dispersos o remotos difíciles de conectar" onclick="selectR(this,'q_cultura')"><div class="r-dot"><div class="r-dot-i"></div></div>Equipos dispersos o remotos difíciles de conectar</div>
+            <div class="r-item" data-val="Cultura sólida, buscan potenciarla con tecnología" onclick="selectR(this,'q_cultura')"><div class="r-dot"><div class="r-dot-i"></div></div>Cultura sólida — buscan potenciarla con tecnología</div>
+            <div class="r-item" data-val="Exploratorio" onclick="selectR(this,'q_cultura')"><div class="r-dot"><div class="r-dot-i"></div></div>Están explorando opciones, sin urgencia definida</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>¿Cómo reconocen a sus colaboradores hoy?</label>
+          <div class="radio-g" id="q_reconocimiento">
+            <div class="r-item" data-val="No tienen programa formal de reconocimiento" onclick="selectR(this,'q_reconocimiento')"><div class="r-dot"><div class="r-dot-i"></div></div>No tienen programa formal de reconocimiento</div>
+            <div class="r-item" data-val="Reconocimiento manual o esporádico" onclick="selectR(this,'q_reconocimiento')"><div class="r-dot"><div class="r-dot-i"></div></div>Reconocimiento manual o esporádico — sin sistema</div>
+            <div class="r-item" data-val="Tienen algo pero quieren mejorarlo" onclick="selectR(this,'q_reconocimiento')"><div class="r-dot"><div class="r-dot-i"></div></div>Tienen algo pero quieren mejorarlo o escalarlo</div>
+            <div class="r-item" data-val="Programa activo buscando nueva plataforma" onclick="selectR(this,'q_reconocimiento')"><div class="r-dot"><div class="r-dot-i"></div></div>Programa activo — buscan nueva plataforma</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE -->
+      <div id="q_perf_bloque" class="hidden">
+        <div class="field">
+          <label>¿Cuál es el objetivo principal del programa de desempeño?</label>
+          <div class="radio-g" id="q_perf_obj">
+            <div class="r-item" data-val="Impactar desempeño con metas e incentivos claros" onclick="selectR(this,'q_perf_obj')"><div class="r-dot"><div class="r-dot-i"></div></div>Impactar desempeño con metas e incentivos claros</div>
+            <div class="r-item" data-val="Formalizar metas y seguimiento estructurado" onclick="selectR(this,'q_perf_obj')"><div class="r-dot"><div class="r-dot-i"></div></div>Formalizar metas y seguimiento estructurado por equipo</div>
+            <div class="r-item" data-val="Ordenar incentivos actualmente manuales/dispersos" onclick="selectR(this,'q_perf_obj')"><div class="r-dot"><div class="r-dot-i"></div></div>Ordenar incentivos actualmente manuales o dispersos</div>
+            <div class="r-item" data-val="Aumentar productividad de fuerza de ventas" onclick="selectR(this,'q_perf_obj')"><div class="r-dot"><div class="r-dot-i"></div></div>Aumentar productividad de la fuerza de ventas</div>
+            <div class="r-item" data-val="Exploratorio / benchmarking" onclick="selectR(this,'q_perf_obj')"><div class="r-dot"><div class="r-dot-i"></div></div>Exploratorio / benchmarking</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>¿Qué tan maduros son sus KPIs y metas hoy?</label>
+          <div class="radio-g" id="q_kpis">
+            <div class="r-item" data-val="KPIs formales con seguimiento periódico" onclick="selectR(this,'q_kpis')"><div class="r-dot"><div class="r-dot-i"></div></div>KPIs formales con seguimiento periódico</div>
+            <div class="r-item" data-val="KPIs existen pero sin seguimiento estructurado" onclick="selectR(this,'q_kpis')"><div class="r-dot"><div class="r-dot-i"></div></div>Existen KPIs pero sin seguimiento estructurado</div>
+            <div class="r-item" data-val="No existen KPIs formales" onclick="selectR(this,'q_kpis')"><div class="r-dot"><div class="r-dot-i"></div></div>No existen KPIs formales aún</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARTIDAS -->
+      <div class="row2">
+        <div class="field">
+          <label>¿Cuándo quieren implementar?</label>
+          <select id="q_prioridad">
+            <option value="">Selecciona...</option>
+            <option value="Alta (este trimestre)">Este trimestre</option>
+            <option value="Media (próximo semestre)">Próximo semestre</option>
+            <option value="Baja (sin fecha definida)">Sin fecha definida</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Estado del presupuesto</label>
+          <select id="q_presupuesto">
+            <option value="">Selecciona...</option>
+            <option value="Aprobado">Aprobado</option>
+            <option value="En aprobación">En proceso de aprobación</option>
+            <option value="No definido">No definido aún</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Quién es el sponsor del programa?</label>
+        <div class="radio-g" id="q_sponsor">
+          <div class="r-item" data-val="Director/Gerente decisor" onclick="selectR(this,'q_sponsor')"><div class="r-dot"><div class="r-dot-i"></div></div>Director o Gerente con poder de decisión</div>
+          <div class="r-item" data-val="Manager/Jefatura" onclick="selectR(this,'q_sponsor')"><div class="r-dot"><div class="r-dot-i"></div></div>Manager o Jefatura — sin decisión final</div>
+          <div class="r-item" data-val="Sin sponsor claro" onclick="selectR(this,'q_sponsor')"><div class="r-dot"><div class="r-dot-i"></div></div>Sin sponsor claro aún</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 5: CONFIRMAR -->
+    <div id="step5" class="hidden">
+      <div class="step-tag">Paso 5 — Confirmar y generar</div>
+      <div style="font-size:12px;color:#6B6B6B;margin-bottom:1.25rem;line-height:1.6;">Revisa los datos antes de generar. La propuesta se enviará a tu correo en aproximadamente 60 segundos.</div>
+      <div style="background:#F5F5F7;border-radius:10px;padding:1rem 1.25rem;margin-bottom:0;">
+        <div class="rev-row"><span class="rev-k">Producto</span><span class="rev-v" id="rv_prod">—</span></div>
+        <div class="rev-row"><span class="rev-k">Empresa</span><span class="rev-v" id="rv_emp">—</span></div>
+        <div class="rev-row"><span class="rev-k">Industria</span><span class="rev-v" id="rv_ind">—</span></div>
+        <div class="rev-row"><span class="rev-k">Colaboradores</span><span class="rev-v" id="rv_col">—</span></div>
+        <div class="rev-row"><span class="rev-k">Países</span><span class="rev-v" id="rv_pai">—</span></div>
+        <div class="rev-row"><span class="rev-k">KAM</span><span class="rev-v" id="rv_kam">—</span></div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="step_ok" class="hidden">
+      <div class="ok-wrap">
+        <div class="ok-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div class="ok-title">Propuesta en camino</div>
+        <div class="ok-sub">Claude está generando el contenido personalizado. Recibirás el link de la presentación en tu correo en unos segundos.</div>
+        <div class="ok-detail" id="ok_detail"></div>
+        <div style="border-top:0.5px solid #E0E0E5;padding-top:1.25rem;">
+          <div style="font-size:12px;color:#6B6B6B;margin-bottom:0.75rem;">¿Necesitas también el pricing para este cliente?</div>
+          <a class="pricing-link" href="https://cotizacionsaas.netlify.app/" target="_blank">
+            → Ir a la calculadora de pricing
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer" id="footer">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn-back hidden" id="btn_back" onclick="prev()">← Volver</button>
+        <span class="prog" id="prog_txt">Paso 1 de 5</span>
+      </div>
+      <button class="btn-next" id="btn_next" onclick="next()">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let cur = 1;
+let producto = 'Apprecio Teams';
+
+function selectProd(p) {
+  producto = p === 'teams' ? 'Apprecio Teams' : 'Apprecio Performance';
+  document.getElementById('prod_teams').classList.toggle('sel', p === 'teams');
+  document.getElementById('prod_perf').classList.toggle('sel', p === 'performance');
+  updateStep4();
+}
+
+function updateStep4() {
+  const isT = producto === 'Apprecio Teams';
+  document.getElementById('q_teams_bloque').classList.toggle('hidden', !isT);
+  document.getElementById('q_perf_bloque').classList.toggle('hidden', isT);
+}
+
+function toggleCheck(el) { el.classList.toggle('sel'); }
+
+function selectR(el, gid) {
+  document.querySelectorAll('#' + gid + ' .r-item').forEach(r => r.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function getChecked(gid) {
+  return Array.from(document.querySelectorAll('#' + gid + ' .c-item.sel')).map(e => e.dataset.val);
+}
+
+function getRadio(gid) {
+  const el = document.querySelector('#' + gid + ' .r-item.sel');
+  return el ? el.dataset.val : '';
+}
+
+function calcTier() {
+  const col = document.getElementById('colaboradores').value;
+  if (col === '2000+') return 'A+';
+  if (col === '500-1999') return 'A';
+  return 'B';
+}
+
+function fillReview() {
+  document.getElementById('rv_prod').textContent = producto;
+  document.getElementById('rv_emp').textContent = document.getElementById('empresa').value || '—';
+  document.getElementById('rv_ind').textContent = document.getElementById('industria').value || '—';
+  document.getElementById('rv_col').textContent = document.getElementById('colaboradores').value || '—';
+  document.getElementById('rv_pai').textContent = getChecked('paises_check').join(', ') || '—';
+  document.getElementById('rv_kam').textContent = document.getElementById('kam_nombre').value || '—';
+}
+
+function showStep(n) {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('step' + i).classList.toggle('hidden', i !== n);
+    const sn = document.getElementById('sn' + i);
+    const sl = document.getElementById('sl' + i);
+    sn.className = 's-num ' + (i < n ? 'done' : i === n ? 'active' : 'pending');
+    sn.innerHTML = i < n ? '✓' : i;
+    sl.className = 's-label' + (i === n ? ' active' : '');
+  }
+  document.getElementById('btn_back').classList.toggle('hidden', n === 1);
+  document.getElementById('prog_txt').textContent = 'Paso ' + n + ' de 5';
+  document.getElementById('btn_next').textContent = n === 5 ? 'Generar propuesta →' : 'Continuar →';
+}
+
+function next() {
+  if (cur === 5) { submit(); return; }
+  cur++;
+  if (cur === 5) fillReview();
+  showStep(cur);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prev() {
+  if (cur > 1) { cur--; showStep(cur); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+}
+
+function submit() {
+  document.getElementById('footer').classList.add('hidden');
+  for (let i = 1; i <= 5; i++) document.getElementById('step' + i).classList.add('hidden');
+
+  const empresa = document.getElementById('empresa').value;
+  const kam_correo = document.getElementById('kam_correo').value;
+  const paises = getChecked('paises_check');
+  const isTeams = producto === 'Apprecio Teams';
+
+  document.getElementById('ok_detail').innerHTML =
+    '<strong>Empresa:</strong> ' + empresa + '<br>' +
+    '<strong>Producto:</strong> ' + producto + '<br>' +
+    '<strong>Enviando a:</strong> ' + kam_correo;
+  document.getElementById('step_ok').classList.remove('hidden');
+
+  const aqsObj = isTeams
+    ? (getRadio('q_cultura') || 'Principalmente reconocimiento general')
+    : (getRadio('q_perf_obj') || 'Impactar desempeño con metas e incentivos claros');
+
+  const aqsKpi = isTeams
+    ? (getRadio('q_reconocimiento') || 'Reconocimiento manual o esporádico')
+    : (getRadio('q_kpis') || 'KPIs existen pero sin seguimiento estructurado');
+
+  const payload = {
+    'Nombre de la empresa': empresa,
+    'Página web': document.getElementById('web').value,
+    'Nombre KAM': document.getElementById('kam_nombre').value,
+    'Correo KAM': kam_correo,
+    'Contacto y cargo del cliente': document.getElementById('contacto').value,
+    'Correo del cliente': document.getElementById('correo_cliente').value,
+    'Industria de la empresa': document.getElementById('industria').value,
+    'Número de usuarios': document.getElementById('colaboradores').value,
+    'Tier del cliente': calcTier(),
+    'País(es) de la propuesta': paises,
+    'Descripción de la empresa': document.getElementById('descripcion').value,
+    'Objetivo principal del programa': document.getElementById('objetivo').value,
+    'Rol foco del programa (¿A quién está dirigido?)': getRadio('rol_group'),
+    'Aspecto a monitorear o minimizar': aqsObj,
+    '¿Son clientes actuales? Si es que son, ¿qué área nos compra puntos?': document.getElementById('cliente_actual').value,
+    'Comentarios adicionales o notas del KAM': document.getElementById('comentarios').value,
+    'AQS - Objetivo estratégico del programa': aqsObj,
+    'AQS - Madurez en KPIs/metas': aqsKpi,
+    'AQS - Prioridad de implementación': document.getElementById('q_prioridad').value,
+    'AQS - Estado del presupuesto': document.getElementById('q_presupuesto').value,
+    'AQS - Nivel del sponsor': getRadio('q_sponsor'),
+    'AQS - Cobertura del programa': paises.length > 1 ? 'Multipaís: ' + paises.join(', ') : (paises[0] || 'Chile'),
+    'Producto SaaS': producto,
+    submittedAt: new Date().toISOString(),
+    formMode: 'html'
+  };
+
+  fetch('https://n8n.openip.cl/webhook/cc588c32-6fb7-4696-8109-321f9e5e6524', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+}
+
+
+function applyPrefillFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  function setValue(id, key) {
+    const value = params.get(key);
+    const el = document.getElementById(id);
+    if (value !== null && el) {
+      el.value = value;
+    }
+  }
+
+  function normalize(value) {
+    return (value || '').toString().trim().toLowerCase();
+  }
+
+  function selectProductFromParam() {
+    const value = normalize(params.get('producto'));
+
+    if (!value) return;
+
+    if (value === 'apprecio performance' || value === 'performance') {
+      selectProd('performance');
+    }
+
+    if (value === 'apprecio teams' || value === 'teams') {
+      selectProd('teams');
+    }
+  }
+
+  function selectRadioByValue(groupId, value) {
+    if (!value) return;
+
+    const options = document.querySelectorAll('#' + groupId + ' .r-item');
+    options.forEach(el => {
+      if (el.dataset.val === value) {
+        selectR(el, groupId);
+      }
+    });
+  }
+
+  function selectCountriesFromParam() {
+    const value = params.get('paises');
+    if (!value) return;
+
+    const selectedCountries = value.split(',').map(v => v.trim()).filter(Boolean);
+
+    document.querySelectorAll('#paises_check .c-item').forEach(el => {
+      el.classList.remove('sel');
+      if (selectedCountries.includes(el.dataset.val)) {
+        el.classList.add('sel');
+      }
+    });
+  }
+
+  selectProductFromParam();
+
+  setValue('empresa', 'empresa');
+  setValue('web', 'web');
+  setValue('kam_nombre', 'kam_nombre');
+  setValue('kam_correo', 'kam_correo');
+  setValue('contacto', 'contacto');
+  setValue('correo_cliente', 'correo_cliente');
+  setValue('industria', 'industria');
+  setValue('colaboradores', 'colaboradores');
+  setValue('descripcion', 'descripcion');
+  setValue('cliente_actual', 'cliente_actual');
+  setValue('objetivo', 'objetivo');
+  setValue('comentarios', 'comentarios');
+  setValue('q_prioridad', 'q_prioridad');
+  setValue('q_presupuesto', 'q_presupuesto');
+
+  selectCountriesFromParam();
+
+  selectRadioByValue('rol_group', params.get('rol_foco'));
+  selectRadioByValue('q_sponsor', params.get('q_sponsor'));
+  selectRadioByValue('q_perf_obj', params.get('q_perf_obj'));
+  selectRadioByValue('q_kpis', params.get('q_kpis'));
+  selectRadioByValue('q_cultura', params.get('q_cultura'));
+  selectRadioByValue('q_reconocimiento', params.get('q_reconocimiento'));
+
+  updateStep4();
+}
+
+applyPrefillFromURL();
+showStep(1);
+</script>
+</body>
+</html>
