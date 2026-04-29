@@ -1,166 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preparar propuesta desde Diio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparar propuesta desde Diio</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f7;
-      padding: 40px;
-      color: #1B1B1B;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f7;
+  padding: 40px;
+  color: #1B1B1B;
+}
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      border: 1px solid #e5e5e5;
-    }
+.container {
+  max-width: 720px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+}
 
-    h1 {
-      margin-bottom: 10px;
-    }
+h1 { margin-bottom: 10px; }
 
-    .field {
-      margin-bottom: 15px;
-    }
+.field { margin-bottom: 15px; }
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
-    }
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
 
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-    }
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
 
-    textarea {
-      min-height: 220px;
-    }
+textarea {
+  min-height: 220px;
+}
 
-    button {
-      background: #FA345E;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+button {
+  background: #FA345E;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .status {
-      margin-top: 15px;
-      font-size: 13px;
-    }
+.status {
+  margin-top: 15px;
+  font-size: 13px;
+}
 
-    .error { color: red; }
-    .ok { color: green; }
-  </style>
+.error { color: red; }
+.ok { color: green; }
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Preparar propuesta desde Diio</h1>
+<div class="container">
 
-    <!-- KAM -->
-    <div class="field">
-      <label>Nombre KAM</label>
-      <input id="kam_nombre">
-    </div>
+<h1>Preparar propuesta desde Diio</h1>
 
-    <div class="field">
-      <label>Correo KAM</label>
-      <input id="kam_correo">
-    </div>
+<!-- 🔴 PRODUCTO -->
+<div class="field">
+  <label>Producto de la propuesta</label>
+  <select id="producto">
+    <option value="Apprecio Performance">Apprecio Performance</option>
+    <option value="Apprecio Teams">Apprecio Teams</option>
+  </select>
+</div>
 
-    <!-- NUEVOS CAMPOS -->
-    <div class="field">
-      <label>Nombre Empresa</label>
-      <input id="empresa">
-    </div>
+<!-- KAM -->
+<div class="field">
+  <label>Nombre KAM</label>
+  <input id="kam_nombre">
+</div>
 
-    <div class="field">
-      <label>Nombre Cliente</label>
-      <input id="contacto">
-    </div>
+<div class="field">
+  <label>Correo KAM</label>
+  <input id="kam_correo">
+</div>
 
-    <div class="field">
-      <label>Correo Cliente</label>
-      <input id="correo_cliente">
-    </div>
+<!-- CLIENTE -->
+<div class="field">
+  <label>Nombre Empresa</label>
+  <input id="empresa">
+</div>
 
-    <!-- TEXTO DIIO -->
-    <div class="field">
-      <label>Resumen Diio</label>
-      <textarea id="resumen_diio"></textarea>
-    </div>
+<div class="field">
+  <label>Nombre Cliente</label>
+  <input id="contacto">
+</div>
 
-    <button onclick="submitData()">Preparar formulario</button>
+<div class="field">
+  <label>Correo Cliente</label>
+  <input id="correo_cliente">
+</div>
 
-    <div id="status" class="status"></div>
-  </div>
+<!-- RESUMEN DIIO -->
+<div class="field">
+  <label>Resumen Diio</label>
+  <textarea id="resumen_diio"></textarea>
+</div>
 
-  <script>
-    const WEBHOOK_URL = 'https://n8n.openip.cl/webhook/diio-resumen-manual';
+<button onclick="submitData()">Preparar formulario</button>
 
-    async function submitData() {
-      const status = document.getElementById('status');
+<div id="status" class="status"></div>
 
-      const payload = {
-        kam_nombre: document.getElementById('kam_nombre').value,
-        kam_correo: document.getElementById('kam_correo').value,
+</div>
 
-        empresa: document.getElementById('empresa').value,
-        contacto: document.getElementById('contacto').value,
-        correo_cliente: document.getElementById('correo_cliente').value,
+<script>
+const WEBHOOK_URL = 'https://n8n.openip.cl/webhook/diio-resumen-manual';
 
-        resumen_diio: document.getElementById('resumen_diio').value,
-        tipo_reunion: 'Exploración Fuerza'
-      };
+async function submitData() {
+  const status = document.getElementById('status');
 
-      if (!payload.kam_nombre || !payload.kam_correo || !payload.resumen_diio) {
-        status.className = 'status error';
-        status.textContent = 'Completa los campos obligatorios';
-        return;
-      }
+  const payload = {
+    producto: document.getElementById('producto').value,
 
-      status.textContent = 'Enviando...';
+    kam_nombre: document.getElementById('kam_nombre').value,
+    kam_correo: document.getElementById('kam_correo').value,
 
-      try {
-        const res = await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+    empresa: document.getElementById('empresa').value,
+    contacto: document.getElementById('contacto').value,
+    correo_cliente: document.getElementById('correo_cliente').value,
 
-        const text = await res.text();
+    resumen_diio: document.getElementById('resumen_diio').value,
+    tipo_reunion: 'Exploración Fuerza'
+  };
 
-        let data = {};
-        try {
-          data = JSON.parse(text);
-        } catch {}
+  if (!payload.kam_nombre || !payload.kam_correo || !payload.resumen_diio) {
+    status.className = 'status error';
+    status.textContent = 'Completa los campos obligatorios';
+    return;
+  }
 
-        if (data.form_url) {
-          window.location.href = data.form_url;
-        } else {
-          status.className = 'status ok';
-          status.textContent = 'Enviado correctamente';
-        }
+  status.textContent = 'Enviando...';
 
-      } catch (e) {
-        status.className = 'status error';
-        status.textContent = 'Error enviando a n8n';
-      }
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await res.text();
+
+    let data = {};
+    try { data = JSON.parse(text); } catch {}
+
+    if (data.form_url) {
+      window.location.href = data.form_url;
+    } else {
+      status.className = 'status ok';
+      status.textContent = 'Enviado correctamente';
     }
-  </script>
+
+  } catch (e) {
+    status.className = 'status error';
+    status.textContent = 'Error enviando a n8n';
+  }
+}
+</script>
+
 </body>
 </html>
