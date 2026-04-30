@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Propuesta Apprecio</title>
+  <title>Propuesta Comercial</title>
   <style>
     body {
       font-family: Arial;
@@ -10,120 +10,90 @@
       padding: 40px;
     }
     .container {
+      max-width: 800px;
+      margin: auto;
       background: white;
       padding: 30px;
       border-radius: 10px;
-      max-width: 800px;
-      margin: auto;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
     }
     input, textarea, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      padding: 8px;
+    }
+    button {
+      background: #FA345E;
+      color: white;
+      border: none;
+      padding: 12px;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
-
 <div class="container">
-  <h1>Propuesta Comercial</h1>
 
-  <label>Producto</label>
-  <input id="producto">
+<h2>Propuesta Comercial</h2>
 
-  <label>Empresa</label>
-  <input id="empresa">
+<input id="producto" placeholder="Producto">
+<input id="empresa" placeholder="Empresa">
+<input id="web" placeholder="Web">
+<input id="contacto" placeholder="Contacto">
+<input id="correo_cliente" placeholder="Correo Cliente">
+<input id="kam_nombre" placeholder="Nombre KAM">
+<input id="kam_correo" placeholder="Correo KAM">
+<input id="industria" placeholder="Industria">
 
-  <label>Web</label>
-  <input id="web">
+<select id="colaboradores">
+  <option value="">Colaboradores</option>
+  <option>150-499</option>
+  <option>500-1999</option>
+  <option>2000+</option>
+</select>
 
-  <label>Contacto</label>
-  <input id="contacto">
+<textarea id="descripcion" placeholder="Descripción"></textarea>
 
-  <label>Correo Cliente</label>
-  <input id="correo_cliente">
+<select id="cliente_actual">
+  <option>No</option>
+  <option>Sí</option>
+</select>
 
-  <label>Nombre KAM</label>
-  <input id="kam_nombre">
+<textarea id="objetivo" placeholder="Objetivo"></textarea>
 
-  <label>Correo KAM</label>
-  <input id="kam_correo">
+<select id="rol_foco">
+  <option>Colaboradores en general</option>
+  <option>Fuerza de ventas y comerciales</option>
+  <option>Líderes y jefaturas</option>
+  <option>Operaciones y terreno</option>
+  <option>Área específica</option>
+</select>
 
-  <label>Industria</label>
-  <input id="industria">
+<textarea id="comentarios" placeholder="Comentarios"></textarea>
 
-  <label>Colaboradores</label>
-  <select id="colaboradores">
-    <option value="">Seleccionar</option>
-    <option>150-499</option>
-    <option>500-1999</option>
-    <option>2000+</option>
-  </select>
+<select id="q_prioridad">
+  <option>Alta (este trimestre)</option>
+  <option>Media (próximo semestre)</option>
+  <option>Baja (sin fecha definida)</option>
+</select>
 
-  <label>Descripción</label>
-  <textarea id="descripcion"></textarea>
+<select id="q_presupuesto">
+  <option>Aprobado</option>
+  <option>En aprobación</option>
+  <option>No definido</option>
+</select>
 
-  <label>Cliente Actual</label>
-  <select id="cliente_actual">
-    <option value="">Seleccionar</option>
-    <option>Si</option>
-    <option>No</option>
-  </select>
+<select id="q_sponsor">
+  <option>Director/Gerente decisor</option>
+  <option>Manager/Jefatura</option>
+  <option>Sin sponsor claro</option>
+</select>
 
-  <label>Objetivo</label>
-  <textarea id="objetivo"></textarea>
-
-  <label>Rol Foco</label>
-  <select id="rol_foco">
-    <option value="">Seleccionar</option>
-    <option>Colaboradores en general</option>
-    <option>Fuerza de ventas y comerciales</option>
-    <option>Líderes y jefaturas</option>
-    <option>Operaciones y terreno</option>
-    <option>Área específica</option>
-  </select>
-
-  <label>Comentarios</label>
-  <textarea id="comentarios"></textarea>
-
-  <label>Prioridad</label>
-  <select id="q_prioridad">
-    <option value="">Seleccionar</option>
-    <option>Alta (este trimestre)</option>
-    <option>Media (próximo semestre)</option>
-    <option>Baja (sin fecha definida)</option>
-  </select>
-
-  <label>Presupuesto</label>
-  <select id="q_presupuesto">
-    <option value="">Seleccionar</option>
-    <option>Aprobado</option>
-    <option>En aprobación</option>
-    <option>No definido</option>
-  </select>
-
-  <label>Sponsor</label>
-  <select id="q_sponsor">
-    <option value="">Seleccionar</option>
-    <option>Director/Gerente decisor</option>
-    <option>Manager/Jefatura</option>
-    <option>Sin sponsor claro</option>
-  </select>
+<button onclick="enviarPropuesta()">Generar propuesta</button>
 
 </div>
 
-<!-- 🔥 PREFILL SCRIPT -->
+<!-- 🔥 PREFILL -->
 <script>
 const params = new URLSearchParams(window.location.search);
 
@@ -151,6 +121,46 @@ setValue('comentarios', 'comentarios');
 setValue('q_prioridad', 'q_prioridad');
 setValue('q_presupuesto', 'q_presupuesto');
 setValue('q_sponsor', 'q_sponsor');
+</script>
+
+<!-- 🔥 ENVÍO A N8N -->
+<script>
+function enviarPropuesta() {
+  const data = {
+    producto: document.getElementById('producto').value,
+    empresa: document.getElementById('empresa').value,
+    web: document.getElementById('web').value,
+    contacto: document.getElementById('contacto').value,
+    correo_cliente: document.getElementById('correo_cliente').value,
+    kam_nombre: document.getElementById('kam_nombre').value,
+    kam_correo: document.getElementById('kam_correo').value,
+    industria: document.getElementById('industria').value,
+    colaboradores: document.getElementById('colaboradores').value,
+    descripcion: document.getElementById('descripcion').value,
+    cliente_actual: document.getElementById('cliente_actual').value,
+    objetivo: document.getElementById('objetivo').value,
+    rol_foco: document.getElementById('rol_foco').value,
+    comentarios: document.getElementById('comentarios').value,
+    q_prioridad: document.getElementById('q_prioridad').value,
+    q_presupuesto: document.getElementById('q_presupuesto').value,
+    q_sponsor: document.getElementById('q_sponsor').value
+  };
+
+  fetch('https://n8n.openip.cl/webhook/cc588c32-6fb7-4696-8109-321f9e5e6524', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    alert('Propuesta enviada correctamente 🚀');
+  })
+  .catch(err => {
+    alert('Error enviando propuesta');
+    console.error(err);
+  });
+}
 </script>
 
 </body>
