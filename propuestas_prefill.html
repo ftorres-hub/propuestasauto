@@ -8,7 +8,9 @@
       font-family: Arial;
       background: #f5f5f5;
       padding: 40px;
+      color: #1B1B1B;
     }
+
     .container {
       max-width: 800px;
       margin: auto;
@@ -16,17 +18,40 @@
       padding: 30px;
       border-radius: 10px;
     }
+
+    .success-container {
+      max-width: 520px;
+      margin: 120px auto;
+      background: white;
+      padding: 36px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .success-container h1 {
+      font-size: 22px;
+      margin: 0;
+      color: #1B1B1B;
+    }
+
     input, textarea, select {
       width: 100%;
       margin-bottom: 15px;
       padding: 8px;
+      box-sizing: border-box;
     }
+
     button {
       background: #FA345E;
       color: white;
       border: none;
       padding: 12px;
       cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -89,11 +114,10 @@
   <option>Sin sponsor claro</option>
 </select>
 
-<button onclick="enviarPropuesta()">Generar propuesta</button>
+<button id="submitButton" onclick="enviarPropuesta()">Generar propuesta</button>
 
 </div>
 
-<!-- 🔥 PREFILL -->
 <script>
 const params = new URLSearchParams(window.location.search);
 
@@ -123,9 +147,18 @@ setValue('q_presupuesto', 'q_presupuesto');
 setValue('q_sponsor', 'q_sponsor');
 </script>
 
-<!-- 🔥 ENVÍO A N8N -->
 <script>
+function showSuccessMessage() {
+  document.body.innerHTML = `
+    <div class="success-container">
+      <h1>Tu propuesta fue enviada con éxito.</h1>
+    </div>
+  `;
+}
+
 function enviarPropuesta() {
+  const button = document.getElementById('submitButton');
+
   const data = {
     producto: document.getElementById('producto').value,
     empresa: document.getElementById('empresa').value,
@@ -146,6 +179,9 @@ function enviarPropuesta() {
     q_sponsor: document.getElementById('q_sponsor').value
   };
 
+  button.disabled = true;
+  button.textContent = 'Enviando...';
+
   fetch('https://n8n.openip.cl/webhook/cc588c32-6fb7-4696-8109-321f9e5e6524', {
     method: 'POST',
     headers: {
@@ -153,10 +189,16 @@ function enviarPropuesta() {
     },
     body: JSON.stringify(data)
   })
-  .then(() => {
-    alert('Propuesta enviada correctamente 🚀');
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error al enviar');
+    }
+
+    showSuccessMessage();
   })
   .catch(err => {
+    button.disabled = false;
+    button.textContent = 'Generar propuesta';
     alert('Error enviando propuesta');
     console.error(err);
   });
