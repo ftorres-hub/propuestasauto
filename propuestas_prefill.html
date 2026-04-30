@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Propuesta Comercial</title>
+
   <style>
     body {
       font-family: Arial;
@@ -34,10 +35,17 @@
       color: #1B1B1B;
     }
 
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     input, textarea, select {
       width: 100%;
       margin-bottom: 15px;
-      padding: 8px;
+      padding: 10px;
       box-sizing: border-box;
     }
 
@@ -61,31 +69,51 @@
 
 <h2>Propuesta Comercial</h2>
 
-<input id="producto" placeholder="Producto">
-<input id="empresa" placeholder="Empresa">
-<input id="web" placeholder="Web">
-<input id="contacto" placeholder="Contacto">
-<input id="correo_cliente" placeholder="Correo Cliente">
-<input id="kam_nombre" placeholder="Nombre KAM">
-<input id="kam_correo" placeholder="Correo KAM">
-<input id="industria" placeholder="Industria">
+<label>Producto</label>
+<input id="producto">
 
+<label>Empresa</label>
+<input id="empresa">
+
+<label>Página web</label>
+<input id="web">
+
+<label>Contacto</label>
+<input id="contacto">
+
+<label>Correo cliente</label>
+<input id="correo_cliente">
+
+<label>Nombre KAM</label>
+<input id="kam_nombre">
+
+<label>Correo KAM</label>
+<input id="kam_correo">
+
+<label>Industria</label>
+<input id="industria">
+
+<label>Número de colaboradores</label>
 <select id="colaboradores">
-  <option value="">Colaboradores</option>
+  <option value="">Seleccionar</option>
   <option>150-499</option>
   <option>500-1999</option>
   <option>2000+</option>
 </select>
 
-<textarea id="descripcion" placeholder="Descripción"></textarea>
+<label>Descripción de la empresa</label>
+<textarea id="descripcion"></textarea>
 
+<label>¿Es cliente actual?</label>
 <select id="cliente_actual">
   <option>No</option>
   <option>Sí</option>
 </select>
 
-<textarea id="objetivo" placeholder="Objetivo"></textarea>
+<label>Objetivo principal del programa</label>
+<textarea id="objetivo"></textarea>
 
+<label>Rol foco del programa</label>
 <select id="rol_foco">
   <option>Colaboradores en general</option>
   <option>Fuerza de ventas y comerciales</option>
@@ -94,20 +122,24 @@
   <option>Área específica</option>
 </select>
 
-<textarea id="comentarios" placeholder="Comentarios"></textarea>
+<label>Comentarios adicionales</label>
+<textarea id="comentarios"></textarea>
 
+<label>Prioridad de implementación</label>
 <select id="q_prioridad">
   <option>Alta (este trimestre)</option>
   <option>Media (próximo semestre)</option>
   <option>Baja (sin fecha definida)</option>
 </select>
 
+<label>Estado del presupuesto</label>
 <select id="q_presupuesto">
   <option>Aprobado</option>
   <option>En aprobación</option>
   <option>No definido</option>
 </select>
 
+<label>Nivel del sponsor</label>
 <select id="q_sponsor">
   <option>Director/Gerente decisor</option>
   <option>Manager/Jefatura</option>
@@ -118,6 +150,7 @@
 
 </div>
 
+<!-- PREFILL -->
 <script>
 const params = new URLSearchParams(window.location.search);
 
@@ -147,6 +180,7 @@ setValue('q_presupuesto', 'q_presupuesto');
 setValue('q_sponsor', 'q_sponsor');
 </script>
 
+<!-- ENVÍO -->
 <script>
 function showSuccessMessage() {
   document.body.innerHTML = `
@@ -189,11 +223,8 @@ function enviarPropuesta() {
     },
     body: JSON.stringify(data)
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Error al enviar');
-    }
-
+  .then(res => {
+    if (!res.ok) throw new Error();
     showSuccessMessage();
   })
   .catch(err => {
