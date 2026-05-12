@@ -2,152 +2,388 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Propuesta Comercial</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propuesta Comercial — Apprecio Beat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --red: #FA345E;
+      --red-dark: #d01e45;
+      --black: #1B1B1B;
+      --white: #FFFFFF;
+      --rose-light: #FFE6E8;
+      --lavender: #B2A8E7;
+      --teal: #45C1AD;
+      --green: #97E89F;
+      --gray: #888;
+      --border: #E2DADC;
+      --bg: #FAF7F8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial;
-      background: #f5f5f5;
-      padding: 40px;
-      color: #1B1B1B;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      color: var(--black);
+      min-height: 100vh;
     }
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
+    .header { background: var(--black); position: relative; overflow: hidden; }
+
+    .header-bar { display: flex; height: 6px; }
+    .header-bar span:nth-child(1) { background: var(--red);      flex: 4; }
+    .header-bar span:nth-child(2) { background: var(--lavender); flex: 1; }
+    .header-bar span:nth-child(3) { background: var(--teal);     flex: 1; }
+    .header-bar span:nth-child(4) { background: var(--green);    flex: 1; }
+
+    .header-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 28px 40px;
     }
 
-    .success-container {
-      max-width: 520px;
-      margin: 120px auto;
-      background: white;
-      padding: 36px;
-      border-radius: 10px;
-      text-align: center;
+    .header-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 6px;
     }
 
-    .success-container h1 {
-      font-size: 22px;
-      margin: 0;
-      color: #1B1B1B;
+    .header-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--white);
     }
+
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 36px 40px 60px;
+    }
+
+    .section {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      padding: 12px 20px;
+      background: var(--rose-light);
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-dot { width: 7px; height: 7px; flex-shrink: 0; }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .section-body {
+      padding: 22px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: span 2; }
 
     label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: bold;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
     }
 
     input, textarea, select {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      padding: 9px 12px;
+      outline: none;
       width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-      box-sizing: border-box;
+      border-radius: 0;
+      -webkit-appearance: none;
+      transition: border-color 0.15s, background 0.15s;
     }
 
-    button {
-      background: #FA345E;
-      color: white;
-      border: none;
-      padding: 12px;
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--red);
+      background: var(--white);
+    }
+
+    textarea { resize: vertical; min-height: 76px; }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%231B1B1B' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    .submit-area {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .submit-note { font-size: 11px; color: var(--gray); }
+
+    .btn-submit {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--red);
+      border: none;
+      padding: 13px 32px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-submit::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; right: -3px;
+      width: 100%; height: 100%;
+      background: var(--black);
+      z-index: -1;
+    }
+
+    .btn-submit:hover { background: var(--red-dark); transform: translate(-2px, -2px); }
+    .btn-submit:active { transform: none; }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+    .success-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .success-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      padding: 48px 52px;
+      text-align: center;
+      max-width: 440px;
+      position: relative;
+    }
+
+    .success-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--red);
+    }
+
+    .success-icon {
+      width: 44px; height: 44px;
+      background: var(--red);
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-icon svg { width: 22px; height: 22px; }
+    .success-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .success-card p { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+    @media (max-width: 560px) {
+      .header-inner, .main { padding-left: 20px; padding-right: 20px; }
+      .section-body { grid-template-columns: 1fr; }
+      .field.full { grid-column: span 1; }
+      .submit-area { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
-
 <body>
-<div class="container">
 
-<h2>Propuesta Comercial</h2>
+<div class="header">
+  <div class="header-bar"><span></span><span></span><span></span><span></span></div>
+  <div class="header-inner">
+    <div class="header-label">Apprecio Beat</div>
+    <div class="header-title">Propuesta Comercial</div>
+  </div>
+</div>
 
-<label>Producto</label>
-<input id="producto">
+<div class="main" id="formView">
 
-<label>Empresa</label>
-<input id="empresa">
+  <!-- CLIENTE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--red)"></div>
+      <div class="section-title">Información del cliente</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="producto">Producto</label>
+        <input id="producto">
+      </div>
+      <div class="field">
+        <label for="empresa">Empresa</label>
+        <input id="empresa">
+      </div>
+      <div class="field">
+        <label for="web">Página web</label>
+        <input id="web">
+      </div>
+      <div class="field">
+        <label for="contacto">Contacto</label>
+        <input id="contacto">
+      </div>
+      <div class="field">
+        <label for="correo_cliente">Correo cliente</label>
+        <input id="correo_cliente" type="email">
+      </div>
+      <div class="field">
+        <label for="industria">Industria</label>
+        <input id="industria">
+      </div>
+      <div class="field">
+        <label for="colaboradores">Número de colaboradores</label>
+        <select id="colaboradores">
+          <option value="">Seleccionar</option>
+          <option>150-499</option>
+          <option>500-1999</option>
+          <option>2000+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cliente_actual">¿Es cliente actual?</label>
+        <select id="cliente_actual">
+          <option>No</option>
+          <option>Sí</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="descripcion">Descripción de la empresa</label>
+        <textarea id="descripcion"></textarea>
+      </div>
+    </div>
+  </div>
 
-<label>Página web</label>
-<input id="web">
+  <!-- KAM -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--lavender)"></div>
+      <div class="section-title">Datos del KAM</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="kam_nombre">Nombre KAM</label>
+        <input id="kam_nombre">
+      </div>
+      <div class="field">
+        <label for="kam_correo">Correo KAM</label>
+        <input id="kam_correo" type="email">
+      </div>
+    </div>
+  </div>
 
-<label>Contacto</label>
-<input id="contacto">
+  <!-- PROGRAMA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--teal)"></div>
+      <div class="section-title">Detalle del programa</div>
+    </div>
+    <div class="section-body">
+      <div class="field full">
+        <label for="objetivo">Objetivo principal del programa</label>
+        <textarea id="objetivo"></textarea>
+      </div>
+      <div class="field">
+        <label for="rol_foco">Rol foco del programa</label>
+        <select id="rol_foco">
+          <option>Colaboradores en general</option>
+          <option>Fuerza de ventas y comerciales</option>
+          <option>Líderes y jefaturas</option>
+          <option>Operaciones y terreno</option>
+          <option>Área específica</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="comentarios">Comentarios adicionales</label>
+        <textarea id="comentarios"></textarea>
+      </div>
+    </div>
+  </div>
 
-<label>Correo cliente</label>
-<input id="correo_cliente">
+  <!-- QUALIFICACIÓN -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--green)"></div>
+      <div class="section-title">Qualificación</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="q_prioridad">Prioridad de implementación</label>
+        <select id="q_prioridad">
+          <option>Alta (este trimestre)</option>
+          <option>Media (próximo semestre)</option>
+          <option>Baja (sin fecha definida)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="q_presupuesto">Estado del presupuesto</label>
+        <select id="q_presupuesto">
+          <option>Aprobado</option>
+          <option>En aprobación</option>
+          <option>No definido</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="q_sponsor">Nivel del sponsor</label>
+        <select id="q_sponsor">
+          <option>Director/Gerente decisor</option>
+          <option>Manager/Jefatura</option>
+          <option>Sin sponsor claro</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-<label>Nombre KAM</label>
-<input id="kam_nombre">
+  <div class="submit-area">
+    <span class="submit-note">Revisa los datos antes de enviar.</span>
+    <button class="btn-submit" id="submitButton" onclick="enviarPropuesta()">Generar propuesta →</button>
+  </div>
 
-<label>Correo KAM</label>
-<input id="kam_correo">
+</div>
 
-<label>Industria</label>
-<input id="industria">
-
-<label>Número de colaboradores</label>
-<select id="colaboradores">
-  <option value="">Seleccionar</option>
-  <option>150-499</option>
-  <option>500-1999</option>
-  <option>2000+</option>
-</select>
-
-<label>Descripción de la empresa</label>
-<textarea id="descripcion"></textarea>
-
-<label>¿Es cliente actual?</label>
-<select id="cliente_actual">
-  <option>No</option>
-  <option>Sí</option>
-</select>
-
-<label>Objetivo principal del programa</label>
-<textarea id="objetivo"></textarea>
-
-<label>Rol foco del programa</label>
-<select id="rol_foco">
-  <option>Colaboradores en general</option>
-  <option>Fuerza de ventas y comerciales</option>
-  <option>Líderes y jefaturas</option>
-  <option>Operaciones y terreno</option>
-  <option>Área específica</option>
-</select>
-
-<label>Comentarios adicionales</label>
-<textarea id="comentarios"></textarea>
-
-<label>Prioridad de implementación</label>
-<select id="q_prioridad">
-  <option>Alta (este trimestre)</option>
-  <option>Media (próximo semestre)</option>
-  <option>Baja (sin fecha definida)</option>
-</select>
-
-<label>Estado del presupuesto</label>
-<select id="q_presupuesto">
-  <option>Aprobado</option>
-  <option>En aprobación</option>
-  <option>No definido</option>
-</select>
-
-<label>Nivel del sponsor</label>
-<select id="q_sponsor">
-  <option>Director/Gerente decisor</option>
-  <option>Manager/Jefatura</option>
-  <option>Sin sponsor claro</option>
-</select>
-
-<button id="submitButton" onclick="enviarPropuesta()">Generar propuesta</button>
-
+<div class="success-wrap" id="successView" style="display:none">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2>¡Propuesta enviada!</h2>
+    <p>Tu propuesta fue enviada con éxito.</p>
+  </div>
 </div>
 
 <!-- PREFILL -->
@@ -182,14 +418,6 @@ setValue('q_sponsor', 'q_sponsor');
 
 <!-- ENVÍO -->
 <script>
-function showSuccessMessage() {
-  document.body.innerHTML = `
-    <div class="success-container">
-      <h1>Tu propuesta fue enviada con éxito.</h1>
-    </div>
-  `;
-}
-
 function enviarPropuesta() {
   const button = document.getElementById('submitButton');
 
@@ -218,18 +446,17 @@ function enviarPropuesta() {
 
   fetch('https://n8n.openip.cl/webhook/cc588c32-6fb7-4696-8109-321f9e5e6524', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
   .then(res => {
     if (!res.ok) throw new Error();
-    showSuccessMessage();
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').style.display = 'flex';
   })
   .catch(err => {
     button.disabled = false;
-    button.textContent = 'Generar propuesta';
+    button.textContent = 'Generar propuesta →';
     alert('Error enviando propuesta');
     console.error(err);
   });
