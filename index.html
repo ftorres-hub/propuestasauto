@@ -1,148 +1,384 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Preparar propuesta desde Diio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preparar propuesta desde Diio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #FA345E;
+      --red-dark: #d01e45;
+      --black: #1B1B1B;
+      --white: #FFFFFF;
+      --rose-light: #FFE6E8;
+      --lavender: #B2A8E7;
+      --teal: #45C1AD;
+      --green: #97E89F;
+      --gray: #888;
+      --border: #E2DADC;
+      --bg: #FAF7F8;
+    }
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f7;
-  padding: 40px;
-  color: #1B1B1B;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container {
-  max-width: 720px;
-  margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  border: 1px solid #e5e5e5;
-}
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      color: var(--black);
+      min-height: 100vh;
+    }
 
-.success-container {
-  max-width: 520px;
-  margin: 120px auto;
-  background: white;
-  padding: 36px;
-  border-radius: 10px;
-  border: 1px solid #e5e5e5;
-  text-align: center;
-}
+    .header { background: var(--black); position: relative; overflow: hidden; }
 
-.success-container h1 {
-  font-size: 22px;
-  margin: 0;
-  color: #1B1B1B;
-}
+    .header-bar { display: flex; height: 6px; }
+    .header-bar span:nth-child(1) { background: var(--red);      flex: 4; }
+    .header-bar span:nth-child(2) { background: var(--lavender); flex: 1; }
+    .header-bar span:nth-child(3) { background: var(--teal);     flex: 1; }
+    .header-bar span:nth-child(4) { background: var(--green);    flex: 1; }
 
-h1 { margin-bottom: 10px; }
+    .header-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 28px 40px;
+    }
 
-.field { margin-bottom: 15px; }
+    .header-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
+    .header-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--white);
+    }
 
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  box-sizing: border-box;
-}
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 36px 40px 60px;
+    }
 
-textarea {
-  min-height: 220px;
-}
+    .section {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
 
-button {
-  background: #FA345E;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+    .section-header {
+      padding: 12px 20px;
+      background: var(--rose-light);
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+    .section-dot { width: 7px; height: 7px; flex-shrink: 0; }
 
-.status {
-  margin-top: 15px;
-  font-size: 13px;
-}
+    .section-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
 
-.error { color: red; }
-.ok { color: green; }
-</style>
+    .section-body {
+      padding: 22px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: span 2; }
+
+    label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    input, textarea {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      padding: 9px 12px;
+      outline: none;
+      width: 100%;
+      border-radius: 0;
+      -webkit-appearance: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--red);
+      background: var(--white);
+    }
+
+    textarea { resize: vertical; min-height: 200px; }
+
+    /* PRODUCT CARDS */
+    .product-question {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 14px;
+    }
+
+    .product-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .product-card {
+      border: 1.5px solid var(--border);
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .product-card:hover {
+      border-color: #ccc;
+      background: var(--white);
+    }
+
+    .product-card.selected {
+      border-color: var(--red);
+      background: var(--white);
+    }
+
+    .product-card.selected .product-card-tag {
+      background: var(--rose-light);
+      color: var(--red);
+    }
+
+    .product-card-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #f0edf0;
+      color: var(--gray);
+      padding: 3px 8px;
+      margin-bottom: 10px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .product-card-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--black);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .product-card-desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    /* SUBMIT */
+    .submit-area {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .status { font-size: 11px; }
+    .status.error { color: var(--red); }
+    .status.ok { color: #2a9d6e; }
+
+    .btn-submit {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--red);
+      border: none;
+      padding: 13px 32px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-submit::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; right: -3px;
+      width: 100%; height: 100%;
+      background: var(--black);
+      z-index: -1;
+    }
+
+    .btn-submit:hover { background: var(--red-dark); transform: translate(-2px, -2px); }
+    .btn-submit:active { transform: none; }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+    .success-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .success-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      padding: 48px 52px;
+      text-align: center;
+      max-width: 440px;
+      position: relative;
+    }
+
+    .success-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--red);
+    }
+
+    .success-icon {
+      width: 44px; height: 44px;
+      background: var(--red);
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-icon svg { width: 22px; height: 22px; }
+    .success-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .success-card p { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+    @media (max-width: 560px) {
+      .header-inner, .main { padding-left: 20px; padding-right: 20px; }
+      .section-body, .product-cards { grid-template-columns: 1fr; }
+      .field.full { grid-column: span 1; }
+      .submit-area { flex-direction: column; align-items: stretch; }
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
 
-<h1>Preparar propuesta desde Diio</h1>
-
-<div class="field">
-  <label>Producto de la propuesta</label>
-  <select id="producto">
-    <option value="Apprecio Performance">Apprecio Performance</option>
-    <option value="Apprecio Teams">Apprecio Teams</option>
-  </select>
+<div class="header">
+  <div class="header-bar"><span></span><span></span><span></span><span></span></div>
+  <div class="header-inner">
+    <div class="header-label">Apprecio</div>
+    <div class="header-title">Preparar propuesta desde Diio</div>
+  </div>
 </div>
 
-<div class="field">
-  <label>Nombre KAM</label>
-  <input id="kam_nombre">
+<div class="main" id="formView">
+
+  <!-- PRODUCTO -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--red)"></div>
+      <div class="section-title">Producto</div>
+    </div>
+    <div style="padding: 22px 20px;">
+      <div class="product-question">¿Para qué producto es la propuesta?</div>
+      <div class="product-cards">
+        <div class="product-card selected" id="card-beat" onclick="selectProduct('Apprecio Beat', 'card-beat')">
+          <div class="product-card-tag">Cultura y reconocimiento</div>
+          <div class="product-card-name">Apprecio Beat</div>
+          <div class="product-card-desc">Activa la cultura organizacional desde el día a día: reconocimiento, objetivos, recompensas, encuestas y analytics.</div>
+        </div>
+        <div class="product-card" id="card-performance" onclick="selectProduct('Apprecio Performance', 'card-performance')">
+          <div class="product-card-tag">Desempeño e incentivos</div>
+          <div class="product-card-name">Apprecio Performance</div>
+          <div class="product-card-desc">Gestiona metas comerciales, incentivos variables y rankings de desempeño para equipos de ventas y operaciones.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATOS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:var(--lavender)"></div>
+      <div class="section-title">Datos de la propuesta</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="kam_nombre">Nombre KAM</label>
+        <input id="kam_nombre" type="text">
+      </div>
+      <div class="field">
+        <label for="kam_correo">Correo KAM</label>
+        <input id="kam_correo" type="email">
+      </div>
+      <div class="field">
+        <label for="empresa">Nombre Empresa</label>
+        <input id="empresa" type="text">
+      </div>
+      <div class="field">
+        <label for="contacto">Nombre Cliente</label>
+        <input id="contacto" type="text">
+      </div>
+      <div class="field full">
+        <label for="correo_cliente">Correo Cliente</label>
+        <input id="correo_cliente" type="email">
+      </div>
+      <div class="field full">
+        <label for="resumen_diio">Resumen Diio</label>
+        <textarea id="resumen_diio"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <div id="status" class="status"></div>
+    <button class="btn-submit" id="submitButton" onclick="submitData()">Preparar formulario →</button>
+  </div>
+
 </div>
 
-<div class="field">
-  <label>Correo KAM</label>
-  <input id="kam_correo">
-</div>
-
-<div class="field">
-  <label>Nombre Empresa</label>
-  <input id="empresa">
-</div>
-
-<div class="field">
-  <label>Nombre Cliente</label>
-  <input id="contacto">
-</div>
-
-<div class="field">
-  <label>Correo Cliente</label>
-  <input id="correo_cliente">
-</div>
-
-<div class="field">
-  <label>Resumen Diio</label>
-  <textarea id="resumen_diio"></textarea>
-</div>
-
-<button id="submitButton" onclick="submitData()">Preparar formulario</button>
-
-<div id="status" class="status"></div>
-
+<div class="success-wrap" id="successView" style="display:none">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2>¡Respuesta enviada!</h2>
+    <p>Tu respuesta fue enviada con éxito.</p>
+  </div>
 </div>
 
 <script>
 const WEBHOOK_URL = 'https://n8n.openip.cl/webhook/diio-resumen-manual';
 
-function showSuccessMessage() {
-  document.body.innerHTML = `
-    <div class="success-container">
-      <h1>Tu respuesta fue enviada con éxito.</h1>
-    </div>
-  `;
+let selectedProduct = 'Apprecio Beat';
+
+function selectProduct(value, cardId) {
+  selectedProduct = value;
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(cardId).classList.add('selected');
 }
 
 async function submitData() {
@@ -150,29 +386,26 @@ async function submitData() {
   const button = document.getElementById('submitButton');
 
   const payload = {
-    producto: document.getElementById('producto').value,
-
+    producto: selectedProduct,
     kam_nombre: document.getElementById('kam_nombre').value,
     kam_correo: document.getElementById('kam_correo').value,
-
     empresa: document.getElementById('empresa').value,
     contacto: document.getElementById('contacto').value,
     correo_cliente: document.getElementById('correo_cliente').value,
-
     resumen_diio: document.getElementById('resumen_diio').value,
     tipo_reunion: 'Exploración Fuerza'
   };
 
   if (!payload.kam_nombre || !payload.kam_correo || !payload.resumen_diio) {
     status.className = 'status error';
-    status.textContent = 'Completa los campos obligatorios';
+    status.textContent = 'Completa los campos obligatorios.';
     return;
   }
 
   button.disabled = true;
   button.textContent = 'Enviando...';
   status.className = 'status';
-  status.textContent = 'Enviando...';
+  status.textContent = '';
 
   try {
     const res = await fetch(WEBHOOK_URL, {
@@ -180,18 +413,14 @@ async function submitData() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-
-    if (!res.ok) {
-      throw new Error('Error al enviar');
-    }
-
-    showSuccessMessage();
-
+    if (!res.ok) throw new Error();
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').style.display = 'flex';
   } catch (e) {
     button.disabled = false;
-    button.textContent = 'Preparar formulario';
+    button.textContent = 'Preparar formulario →';
     status.className = 'status error';
-    status.textContent = 'Error enviando a n8n';
+    status.textContent = 'Error enviando a n8n.';
   }
 }
 </script>
