@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Pricing — Apprecio</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --rose: #FA345E;
+    --lavender: #B2A8E7;
+    --teal: #146787;
+    --dark: #1B1B1B;
+    --mid: #555;
+    --muted: #999;
+    --light: #f5f4f2;
+    --white: #ffffff;
+    --border: #e8e8e8;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    background: var(--dark);
+    padding: 48px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(178,168,231,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .22em; text-transform: uppercase;
+    color: var(--lavender); margin-bottom: 14px;
+  }
+  .hero-title {
+    font-size: 32px; font-weight: 700;
+    color: var(--white); line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .hero-title span { color: var(--rose); }
+  .hero-sub {
+    font-size: 13px; font-weight: 400;
+    color: rgba(255,255,255,.4); line-height: 1.6;
+    max-width: 420px;
+  }
+
+  /* ── LAYOUT ── */
+  .form-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* ── STEP INDICATOR ── */
+  .steps {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 32px;
+  }
+  .step-item {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+  }
+  .step-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .step-dot.active { background: var(--rose); border-color: var(--rose); color: var(--white); }
+  .step-dot.done { background: var(--dark); border-color: var(--dark); color: var(--white); }
+  .step-label { font-size: 11px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  .step-label.active { color: var(--dark); font-weight: 600; }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeUp .25s ease;
+  }
+  .card.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-eyebrow {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 20px;
+  }
+
+  /* ── FIELDS ── */
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 13px; font-weight: 600;
+    color: var(--dark); margin-bottom: 4px;
+    display: block;
+  }
+  .field-hint {
+    font-size: 11px; font-weight: 400;
+    color: var(--muted); margin-bottom: 8px;
+    display: block; line-height: 1.5;
+  }
+  input[type=text], input[type=email], input[type=number], select, textarea {
+    width: 100%; padding: 11px 14px;
+    border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--light); color: var(--dark);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 400;
+    transition: border-color .15s;
+    -webkit-appearance: none;
+  }
+  textarea {
+    resize: vertical; min-height: 80px; line-height: 1.5;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--rose);
+    background: var(--white);
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ── PILLS ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    border: 1.5px solid var(--border); border-radius: 9px;
+    padding: 8px 14px; cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--mid);
+    background: var(--light); font-family: 'Montserrat', sans-serif;
+    transition: all .15s; user-select: none;
+  }
+  .pill:hover { border-color: var(--rose); color: var(--rose); }
+  .pill.on { background: var(--rose); border-color: var(--rose); color: var(--white); font-weight: 600; }
+
+  /* ── PRICING TYPE CARDS ── */
+  .pricing-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0; }
+  .pricing-type-opt {
+    border: 1.5px solid var(--border); border-radius: 14px;
+    padding: 20px 18px; cursor: pointer; background: var(--light);
+    transition: all .18s; text-align: left;
+  }
+  .pricing-type-opt:hover { border-color: var(--rose); background: #fff8f9; }
+  .pricing-type-opt.on { border-color: var(--rose); background: #fff5f7; }
+  .pt-icon { font-size: 22px; margin-bottom: 10px; }
+  .pt-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .pricing-type-opt.on .pt-name { color: var(--rose); }
+  .pt-desc { font-size: 11px; color: var(--mid); line-height: 1.5; }
+  .pt-badge {
+    display: inline-block; margin-top: 8px;
+    font-size: 9px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 20px;
+    background: var(--light); border: 1px solid var(--border); color: var(--muted);
+  }
+  .pricing-type-opt.on .pt-badge { background: #ffe0e6; border-color: #f5b3be; color: var(--rose); }
+
+  /* ── TRAMOS TABLE ── */
+  .tramos-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  .tramos-table th {
+    font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); padding: 0 8px 10px; text-align: left; border-bottom: 1.5px solid var(--border);
+  }
+  .tramos-table th:last-child { width: 40px; }
+  .tramos-table td { padding: 8px 6px; vertical-align: middle; }
+  .tramos-table td input {
+    padding: 9px 10px; font-size: 13px; background: var(--light);
+    border: 1.5px solid var(--border); border-radius: 8px; width: 100%;
+  }
+  .tramos-table td input:focus { border-color: var(--rose); background: var(--white); }
+  .btn-del-tramo {
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: var(--white);
+    color: var(--muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s; margin: 0 auto;
+  }
+  .btn-del-tramo:hover { border-color: var(--rose); color: var(--rose); background: #fff5f7; }
+  .btn-add-tramo {
+    border: 1.5px dashed var(--border); border-radius: 10px;
+    background: transparent; color: var(--muted);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px; font-weight: 500;
+    padding: 10px 16px; cursor: pointer; width: 100%;
+    transition: all .15s; text-align: center;
+  }
+  .btn-add-tramo:hover { border-color: var(--rose); color: var(--rose); }
+
+  /* ── TIER CARDS ── */
+  .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tier-opt {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; cursor: pointer; background: var(--light);
+    transition: all .15s;
+  }
+  .tier-opt:hover { border-color: var(--rose); }
+  .tier-opt.on { border-color: var(--rose); background: #fff5f7; }
+  .tier-opt-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .tier-opt-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+  .tier-opt.on .tier-opt-name { color: var(--rose); }
+  .tier-opt-range { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .tier-opt-desc { font-size: 11px; color: var(--mid); line-height: 1.45; }
+
+  /* ── CONDITIONAL ── */
+  .cond { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .3s ease, opacity .3s ease, margin .3s ease; margin-top: 0; }
+  .cond.show { max-height: 1200px; opacity: 1; margin-top: 18px; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── NAVIGATION ── */
+  .nav { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-back {
+    flex: 1; padding: 13px;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    background: var(--white); color: var(--mid);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-back:hover { border-color: var(--dark); color: var(--dark); }
+  .btn-next {
+    flex: 2; padding: 13px;
+    border: none; border-radius: 12px;
+    background: var(--rose); color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-next:hover { opacity: .88; }
+  .btn-submit {
+    width: 100%; padding: 14px;
+    border: none; border-radius: 12px;
+    background: var(--dark); color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 28px; transition: opacity .15s;
+    letter-spacing: .02em;
+  }
+  .btn-submit:hover { opacity: .85; }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── SUMMARY ── */
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid #f5f5f5;
+    font-size: 13px; color: var(--mid);
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row strong { color: var(--dark); font-weight: 600; }
+
+  /* ── PRICING BADGE PERSONALIZADO ── */
+  .custom-pricing-badge {
+    background: linear-gradient(135deg, #1B1B1B 0%, #2d2d2d 100%);
+    border-radius: 14px; padding: 24px 28px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .custom-pricing-badge::before {
+    content: ''; position: absolute;
+    top: -30px; right: -30px; width: 120px; height: 120px;
+    border-radius: 50%; background: rgba(178,168,231,0.08);
+  }
+  .cpb-tag { font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--lavender); margin-bottom: 6px; }
+  .cpb-label { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+  .cpb-val { font-size: 28px; font-weight: 700; color: var(--white); }
+
+  /* ── TRAMOS PREVIEW ── */
+  .tramos-preview {
+    background: var(--light); border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .tramos-preview-title {
+    font-size: 10px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 10px;
+  }
+  .tramo-preview-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--mid);
+    padding: 4px 0; border-bottom: 1px solid var(--border);
+  }
+  .tramo-preview-row:last-child { border-bottom: none; }
+  .tramo-preview-row strong { color: var(--dark); font-weight: 600; }
+
+  /* ── APPROVAL ALERT ── */
+  .alert-aprob {
+    border-radius: 10px; padding: 14px 18px;
+    font-size: 13px; font-weight: 500;
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .alert-aprob.warn { background: #FFFBF0; color: #6B4A00; border: 1.5px solid #f5dfa0; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SECTION LABEL ── */
+  .section-lbl {
+    font-size: 10px; font-weight: 600; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--teal); margin: 20px 0 12px;
+  }
+  .section-lbl:first-child { margin-top: 0; }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    display: none; text-align: center;
+    background: var(--white); border-radius: 20px;
+    border: 1px solid var(--border); padding: 56px 40px;
+  }
+  .success-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #F0FAF5; display: flex;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 26px;
+  }
+  .success-title { font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .success-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .hero { padding: 36px 24px 32px; }
+    .hero-title { font-size: 24px; }
+    .form-wrap { padding: 20px 16px 48px; }
+    .card { padding: 22px 18px; }
+    .grid2, .tier-grid, .pricing-type-grid { grid-template-columns: 1fr; }
+    .steps { gap: 0; }
+    .step-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Apprecio · Herramienta comercial</div>
+  <h1 class="hero-title">Calculadora de pricing<span>.</span></h1>
+  <p class="hero-sub">Completa los datos de la oportunidad para generar un estimado de pricing y condiciones comerciales.</p>
+</div>
+
+<div class="form-wrap">
+
+  <!-- STEPS -->
+  <div class="steps" id="steps-bar">
+    <div class="step-item" onclick="goTo(1)">
+      <div class="step-dot active" id="dot-1">1</div>
+      <span class="step-label active" id="lbl-1">Cliente</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" onclick="goTo(1.5)">
+      <div class="step-dot" id="dot-15">2</div>
+      <span class="step-label" id="lbl-15">Pricing</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" onclick="goTo(2)">
+      <div class="step-dot" id="dot-2">3</div>
+      <span class="step-label" id="lbl-2">Producto</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" onclick="goTo(3)">
+      <div class="step-dot" id="dot-3">4</div>
+      <span class="step-label" id="lbl-3">Contexto</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" onclick="goTo(4)">
+      <div class="step-dot" id="dot-4">5</div>
+      <span class="step-label" id="lbl-4">Resultado</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Cliente -->
+  <div class="card active" id="step-1">
+    <div class="card-eyebrow">Paso 1 — Datos del cliente</div>
+
+    <div class="field">
+      <label class="field-label">Nombre de la empresa</label>
+      <input type="text" id="f-empresa" placeholder="Acme S.A.">
+    </div>
+    <div class="field">
+      <label class="field-label">Tu nombre</label>
+      <input type="text" id="f-solicitante" placeholder="Juan Pérez">
+    </div>
+    <div class="field">
+      <label class="field-label">Tu correo <span style="color:#FA345E">*</span></label>
+      <span class="field-hint">Aquí te llegará el estimado.</span>
+      <input type="email" id="f-email" placeholder="juan@apprecio.com">
+    </div>
+
+    <div class="nav">
+      <button class="btn-next" onclick="next(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1.5: Tipo de Pricing -->
+  <div class="card" id="step-15">
+    <div class="card-eyebrow">Paso 2 — Tipo de pricing</div>
+
+    <div class="field">
+      <label class="field-label">¿Qué tipo de pricing aplica para esta oportunidad?</label>
+      <span class="field-hint">El pricing automático sigue la estructura estándar de Apprecio. El personalizado requiere aprobación del Product Manager.</span>
+      <div class="pricing-type-grid">
+        <div class="pricing-type-opt on" id="pt-auto" onclick="selectPricingType('auto')">
+          <div class="pt-icon">⚡</div>
+          <div class="pt-name">Automático</div>
+          <div class="pt-desc">Precio calculado según edición, tier y descuentos estándar de Apprecio.</div>
+          <div class="pt-badge">Estándar</div>
+        </div>
+        <div class="pricing-type-opt" id="pt-custom" onclick="selectPricingType('custom')">
+          <div class="pt-icon">✏️</div>
+          <div class="pt-name">Personalizado</div>
+          <div class="pt-desc">Precio acordado con el cliente, fuera de la estructura estándar.</div>
+          <div class="pt-badge">Requiere aprobación PM</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cond" id="blq-custom">
+      <hr class="divider" style="margin-top:0">
+      <div class="field">
+        <label class="field-label">¿Cómo se estructura el precio?</label>
+        <div class="pill-group" id="g-ctype">
+          <div class="pill on" data-v="tramos" onclick="pill('ctype',this);renderCustomPricing()">Por tramos</div>
+          <div class="pill" data-v="unico" onclick="pill('ctype',this);renderCustomPricing()">Monto único por usuario</div>
+        </div>
+      </div>
+      <div class="cond show" id="blq-tramos">
+        <label class="field-label">Tabla de tramos</label>
+        <span class="field-hint">Define los rangos de usuarios y el precio por usuario en cada tramo.</span>
+        <table class="tramos-table" id="tramos-table">
+          <thead>
+            <tr>
+              <th>Desde (usuarios)</th>
+              <th>Hasta (usuarios)</th>
+              <th>USD / usuario</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tramos-body"></tbody>
+        </table>
+        <button class="btn-add-tramo" onclick="addTramo()">+ Agregar tramo</button>
+      </div>
+      <div class="cond" id="blq-unico">
+        <div class="field">
+          <label class="field-label">Precio por usuario / mes <span style="color:#FA345E">*</span></label>
+          <span class="field-hint">Ingresa el monto acordado en USD.</span>
+          <input type="number" id="f-precio-unico" min="0" step="0.01" placeholder="ej. 3.50">
+        </div>
+      </div>
+      <div class="field" style="margin-top:18px">
+        <label class="field-label">Comentarios adicionales para la cotización</label>
+        <span class="field-hint">Condiciones especiales, contexto de la negociación, notas para el cliente…</span>
+        <textarea id="f-comentarios-custom" placeholder="Ej: Precio acordado en reunión del 15/04 con el CEO. Incluye soporte premium el primer trimestre."></textarea>
+      </div>
+    </div>
+
+    <div class="field" id="blq-comentarios-auto" style="margin-top:22px">
+      <label class="field-label">Comentarios adicionales para la cotización <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+      <span class="field-hint">Notas, condiciones especiales o contexto que quieras incluir en el documento.</span>
+      <textarea id="f-comentarios-auto" placeholder="Ej: Cliente con urgencia de implementar antes de Q3. Coordinado con equipo de CS."></textarea>
+    </div>
+
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(1)">← Atrás</button>
+      <button class="btn-next" onclick="next(15)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Producto -->
+  <div class="card" id="step-2">
+    <div class="card-eyebrow">Paso 3 — Producto y escala</div>
+
+    <div class="field">
+      <label class="field-label">Edición</label>
+      <div class="pill-group" id="g-ed">
+        <div class="pill on" data-v="teams" onclick="pill('ed',this);renderTiers()">Apprecio Beat — USD 4/usuario</div>
+        <div class="pill" data-v="perf" onclick="pill('ed',this);renderTiers()">Apprecio Performance — USD 6/usuario</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label class="field-label">Usuarios iniciales</label>
+        <input type="number" id="f-ui" min="1" value="" placeholder="ej. 300" oninput="renderTiers()">
+      </div>
+      <div class="field">
+        <label class="field-label">Usuarios proyectados</label>
+        <input type="number" id="f-up" min="0" value="" placeholder="ej. 800">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Países donde se cotiza el programa</label>
+      <span class="field-hint">Países incluidos en esta propuesta, no la presencia total de la empresa.</span>
+      <div class="pill-group" id="g-p">
+        <div class="pill on" data-v="1" onclick="pill('p',this)">1 país</div>
+        <div class="pill" data-v="2" onclick="pill('p',this)">2–3 países</div>
+        <div class="pill" data-v="4" onclick="pill('p',this)">4 o más</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label class="field-label">Tier comercial</label>
+      <span class="field-hint">Considera escala, complejidad y potencial estratégico — no solo usuarios iniciales.</span>
+      <div class="tier-grid" id="tier-grid"></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(15)">← Atrás</button>
+      <button class="btn-next" onclick="next(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Contexto -->
+  <div class="card" id="step-3">
+    <div class="card-eyebrow">Paso 4 — Contexto comercial</div>
+
+    <div class="field">
+      <label class="field-label">¿La empresa ya usa alguna solución Apprecio?</label>
+      <div class="pill-group" id="g-yac">
+        <div class="pill on" data-v="no" onclick="pill('yac',this)">No, es cliente nuevo</div>
+        <div class="pill" data-v="si" onclick="pill('yac',this)">Sí, ya es cliente</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">¿Viene migrando desde otro SaaS o plataforma externa?</label>
+      <span class="field-hint">Aplica si el cliente usaba un competidor o sistema propio y ahora adopta Apprecio.</span>
+      <div class="pill-group" id="g-mig">
+        <div class="pill on" data-v="no" onclick="pill('mig',this);togMig()">No</div>
+        <div class="pill" data-v="si" onclick="pill('mig',this);togMig()">Sí</div>
+      </div>
+      <div class="cond" id="blq-mig">
+        <label class="field-label" style="margin-top:4px">¿Desde qué plataforma migra? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+        <input type="text" id="f-plataforma" placeholder="ej. Buk, SAP, desarrollo propio…">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">¿La propuesta expande hacia edición superior o nuevas capacidades?</label>
+      <span class="field-hint">Solo aplica si ya es cliente Apprecio y sube de edición o incorpora módulos nuevos.</span>
+      <div class="pill-group" id="g-cross">
+        <div class="pill on" data-v="no" onclick="pill('cross',this)">No</div>
+        <div class="pill" data-v="si" onclick="pill('cross',this)">Sí — cross-sell</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">¿La propuesta considera período piloto?</label>
+      <div class="pill-group" id="g-pil">
+        <div class="pill on" data-v="no" onclick="pill('pil',this)">No</div>
+        <div class="pill" data-v="si" onclick="pill('pil',this)">Sí — máximo 3 meses</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label class="field-label">Presupuesto mensual en puntos <span style="color:var(--muted);font-weight:400">(USD — dejar vacío si no se sabe)</span></label>
+      <input type="number" id="f-puntos" min="0" placeholder="0">
+    </div>
+
+    <div class="field">
+      <label class="field-label">Add-ons requeridos</label>
+      <span class="field-hint">SSO, integraciones, reportes avanzados, soporte premium, horas CSM, bolsas de IA…</span>
+      <div class="pill-group" id="g-ao">
+        <div class="pill on" data-v="0" onclick="pill('ao',this)">Ninguno</div>
+        <div class="pill" data-v="1" onclick="pill('ao',this)">1 add-on</div>
+        <div class="pill" data-v="2" onclick="pill('ao',this)">2 o más</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">¿Posibilidad de expandir a otra área?</label>
+      <div class="pill-group" id="g-exp">
+        <div class="pill on" data-v="no" onclick="pill('exp',this);togExp()">No</div>
+        <div class="pill" data-v="si" onclick="pill('exp',this);togExp()">Sí</div>
+      </div>
+      <div class="cond" id="blq-exp">
+        <label class="field-label" style="margin-top:4px">¿A qué área podría expandirse?</label>
+        <select id="f-area">
+          <option value="">Selecciona…</option>
+          <option>RRHH</option><option>Comercial</option><option>Operaciones</option>
+          <option>Marketing</option><option>Atención al cliente</option><option>Otra</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn-back" onclick="goTo(2)">← Atrás</button>
+      <button class="btn-next" onclick="next(3)">Ver estimado →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Resultado -->
+  <div class="card" id="step-4">
+    <div class="card-eyebrow">Paso 5 — Estimado de pricing</div>
+    <div id="result-content"></div>
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">Enviar y guardar estimado</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="success">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Estimado enviado</div>
+    <div class="success-sub">El resultado fue enviado a tu correo y guardado en el registro.<br>Puedes cerrar esta ventana.</div>
+  </div>
+
+</div>
+
+<script>
+const S = {
+  ed:'teams', p:'1', yac:'no', mig:'no', cross:'no', pil:'no', ao:'0', exp:'no', tier:'ap',
+  pricingType: 'auto',
+  ctype: 'tramos'
+};
+
+let tramos = [{ desde: '', hasta: '', precio: '' }];
+
+const TIERS = {
+  teams: {
+    ap: { label:'A+', range:'≥ 2.000 usuarios', desc:'Empresa estratégica, alta dispersión geográfica, sponsor CHRO/CEO.', disc:10 },
+    a:  { label:'A',  range:'500–1.999 usuarios', desc:'Organización madura, varias áreas involucradas, liderazgo activo de personas.', disc:5 },
+    b:  { label:'B',  range:'150–499 usuarios', desc:'Intención real de ordenar reconocimiento, 1–2 áreas, presupuesto acotado.', disc:0 },
+    c:  { label:'C',  range:'< 150 usuarios', desc:'Escala reducida, una sola área, implementación simple y enfocada.', disc:0 }
+  },
+  perf: {
+    ap: { label:'A+', range:'≥ 1.000 usuarios', desc:'Empresa multipaís, múltiples integraciones, presión fuerte por KPIs.', disc:10 },
+    a:  { label:'A',  range:'400–999 usuarios', desc:'Gestión comercial estructurada, KPIs claros, necesidad de automatización.', disc:5 },
+    b:  { label:'B',  range:'150–399 usuarios', desc:'KPIs definidos en un área crítica, CRM parcial, 1–2 áreas.', disc:0 },
+    c:  { label:'C',  range:'< 150 usuarios', desc:'Intención inicial de performance, baja escala, menor madurez.', disc:0 }
+  }
+};
+
+function pill(k, el) {
+  el.closest('.pill-group').querySelectorAll('.pill').forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+  S[k] = el.dataset.v;
+}
+
+function selectPricingType(type) {
+  S.pricingType = type;
+  document.getElementById('pt-auto').classList.toggle('on', type === 'auto');
+  document.getElementById('pt-custom').classList.toggle('on', type === 'custom');
+  const blq = document.getElementById('blq-custom');
+  const autoComments = document.getElementById('blq-comentarios-auto');
+  if (type === 'custom') { blq.classList.add('show'); autoComments.style.display = 'none'; }
+  else { blq.classList.remove('show'); autoComments.style.display = 'block'; }
+}
+
+function renderCustomPricing() {
+  const isTramos = S.ctype === 'tramos';
+  document.getElementById('blq-tramos').classList.toggle('show', isTramos);
+  document.getElementById('blq-unico').classList.toggle('show', !isTramos);
+}
+
+function renderTramosTable() {
+  const tbody = document.getElementById('tramos-body');
+  tbody.innerHTML = '';
+  tramos.forEach((t, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td><input type="number" min="0" placeholder="ej. 1" value="${t.desde}" oninput="tramos[${i}].desde=this.value"></td>
+        <td><input type="number" min="0" placeholder="ej. 100" value="${t.hasta}" oninput="tramos[${i}].hasta=this.value"></td>
+        <td><input type="number" min="0" step="0.01" placeholder="ej. 5.00" value="${t.precio}" oninput="tramos[${i}].precio=this.value"></td>
+        <td><button class="btn-del-tramo" onclick="delTramo(${i})" title="Eliminar tramo">×</button></td>
+      </tr>`;
+  });
+}
+
+function addTramo() { tramos.push({ desde: '', hasta: '', precio: '' }); renderTramosTable(); }
+function delTramo(i) { if (tramos.length === 1) return; tramos.splice(i, 1); renderTramosTable(); }
+
+function togMig() {
+  const b = document.getElementById('blq-mig');
+  if (S.mig === 'si') b.classList.add('show'); else b.classList.remove('show');
+}
+
+function togExp() {
+  const b = document.getElementById('blq-exp');
+  if (S.exp === 'si') b.classList.add('show'); else b.classList.remove('show');
+}
+
+function renderTiers() {
+  const t = TIERS[S.ed], g = document.getElementById('tier-grid');
+  g.innerHTML = '';
+  ['ap','a','b','c'].forEach(k => {
+    const d = t[k], on = S.tier === k ? 'on' : '';
+    g.innerHTML += `<div class="tier-opt ${on}" data-v="${k}" onclick="pickTier(this)">
+      <div class="tier-opt-head"><span class="tier-opt-name">Tier ${d.label}</span><span class="tier-opt-range">${d.range}</span></div>
+      <div class="tier-opt-desc">${d.desc}</div>
+    </div>`;
+  });
+}
+
+function pickTier(el) {
+  document.querySelectorAll('.tier-opt').forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+  S.tier = el.dataset.v;
+}
+
+const STEP_ORDER = [1, 1.5, 2, 3, 4];
+const STEP_MAP = { 1: 'dot-1', 1.5: 'dot-15', 2: 'dot-2', 3: 'dot-3', 4: 'dot-4' };
+const STEP_NUMS = { 1: 1, 1.5: 2, 2: 3, 3: 4, 4: 5 };
+
+function goTo(n) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  const stepId = n === 1.5 ? 'step-15' : 'step-' + n;
+  document.getElementById(stepId).classList.add('active');
+  STEP_ORDER.forEach(s => {
+    const dotId = STEP_MAP[s];
+    const lblId = dotId.replace('dot-', 'lbl-').replace('dot-15','lbl-15');
+    const dot = document.getElementById(dotId);
+    const lbl = document.getElementById(lblId);
+    if (!dot) return;
+    dot.classList.remove('active','done');
+    lbl && lbl.classList.remove('active');
+    const sNum = STEP_NUMS[s];
+    if (s < n) { dot.classList.add('done'); dot.textContent = '✓'; }
+    else if (s === n) { dot.classList.add('active'); dot.textContent = sNum; lbl && lbl.classList.add('active'); }
+    else { dot.textContent = sNum; }
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function next(from) {
+  if (from === 1) {
+    if (!document.getElementById('f-email').value.trim()) { alert('Por favor ingresa tu correo.'); return; }
+    goTo(1.5); return;
+  }
+  if (from === 15) {
+    if (S.pricingType === 'custom') {
+      if (S.ctype === 'tramos') {
+        const filled = tramos.filter(t => t.desde !== '' && t.hasta !== '' && t.precio !== '');
+        if (filled.length === 0) { alert('Por favor completa al menos un tramo.'); return; }
+      } else {
+        if (!document.getElementById('f-precio-unico').value) { alert('Por favor ingresa el precio por usuario.'); return; }
+      }
+    }
+    goTo(2); return;
+  }
+  if (from === 2) {
+    if (!document.getElementById('f-ui').value) { alert('Por favor ingresa los usuarios iniciales.'); return; }
+    goTo(3); return;
+  }
+  if (from === 3) { buildResult(); goTo(4); return; }
+  goTo(from + 1);
+}
+
+function calcPricing() {
+  const ui    = Math.max(1, parseInt(document.getElementById('f-ui').value) || 0);
+  const up    = parseInt(document.getElementById('f-up').value) || 0;
+  const puntos= parseFloat(document.getElementById('f-puntos').value) || 0;
+  const pxu   = S.ed === 'perf' ? 6 : 4;
+  const fee   = ui * pxu;
+  const td    = TIERS[S.ed][S.tier].disc;
+  let dp = 0; if (S.p==='2') dp=5; else if (S.p==='4') dp=10;
+  const dm    = S.mig === 'si' ? 5 : 0;
+  const dpil  = S.pil === 'si' ? 10 : 0;
+  const dc    = S.yac === 'si' && S.cross === 'si' ? 5 : 0;
+  const db    = S.ao==='1' ? 5 : S.ao==='2' ? 10 : 0;
+  const dtot  = td + dp + dm + dpil + dc + db;
+  const totC  = fee * (1 - dtot / 100);
+  const pemp  = ui > 0 ? totC / ui : 0;
+  const mult  = fee > 0 ? puntos / fee : 0;
+  const dpts  = mult >= 12 ? 10 : mult >= 6 ? 5 : 0;
+  const totP  = puntos * (1 - dpts / 100);
+  return { ui, up, puntos, pxu, fee, td, dp, dm, dpil, dc, db, dtot, totC, pemp, mult, dpts, totP };
+}
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+function buildResult() {
+  const c = calcPricing();
+  const t = TIERS[S.ed][S.tier];
+  const plataforma = document.getElementById('f-plataforma').value.trim();
+  const area       = document.getElementById('f-area').value;
+  const paisLabel  = S.p === '1' ? '1 país' : S.p === '2' ? '2–3 países' : '4 o más países';
+  const isCustom   = S.pricingType === 'custom';
+  const comentarios = isCustom
+    ? document.getElementById('f-comentarios-custom').value.trim()
+    : document.getElementById('f-comentarios-auto').value.trim();
+
+  let pricingBlock = '';
+
+  if (isCustom) {
+    pricingBlock += `<div class="alert-aprob warn"><div class="alert-icon">⚠️</div><div>Este pricing es personalizado y <strong>requiere aprobación del Product Manager Comercial</strong> antes de ser enviado al cliente.</div></div>`;
+    if (S.ctype === 'tramos') {
+      const tramosValidos = tramos.filter(t => t.desde !== '' && t.hasta !== '' && t.precio !== '');
+      let tramosRows = tramosValidos.map(t =>
+        `<div class="tramo-preview-row"><span>${t.desde} – ${t.hasta} usuarios</span><strong>USD ${parseFloat(t.precio).toFixed(2)} / usuario</strong></div>`
+      ).join('');
+      pricingBlock += `
+        <div class="custom-pricing-badge">
+          <div class="cpb-tag">Pricing personalizado · Por tramos</div>
+          <div class="cpb-label">Estructura de precios acordada</div>
+          <div class="cpb-val">${tramosValidos.length} tramo${tramosValidos.length !== 1 ? 's' : ''} definido${tramosValidos.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="tramos-preview">
+          <div class="tramos-preview-title">Detalle de tramos</div>
+          ${tramosRows}
+        </div>`;
+    } else {
+      const precioUnico = parseFloat(document.getElementById('f-precio-unico').value) || 0;
+      const totalMensual = precioUnico * c.ui;
+      pricingBlock += `
+        <div class="custom-pricing-badge">
+          <div class="cpb-tag">Pricing personalizado · Monto único</div>
+          <div class="cpb-label">Precio por usuario / mes</div>
+          <div class="cpb-val">USD ${precioUnico.toFixed(2)}</div>
+        </div>
+        <div class="summary-row"><span>Usuarios</span><strong>${c.ui.toLocaleString()}</strong></div>
+        <div class="summary-row"><span>Total mensual estimado</span><strong>${fmt(totalMensual)}</strong></div>`;
+    }
+  } else {
+    pricingBlock += `
+      <div class="custom-pricing-badge" style="background:linear-gradient(135deg,#146787,#1a8aac)">
+        <div class="cpb-tag">Precio efectivo por usuario</div>
+        <div class="cpb-label">Con descuento total de ${c.dtot}%</div>
+        <div class="cpb-val">USD ${c.pemp.toFixed(2)}</div>
+      </div>
+      <div class="summary-row"><span>Precio lista</span><strong>USD ${c.pxu} / usuario</strong></div>
+      <div class="summary-row"><span>Descuento total</span><strong>${c.dtot}%</strong></div>
+      <div class="summary-row"><span>Usuarios iniciales</span><strong>${c.ui.toLocaleString()}</strong></div>
+      <div class="summary-row"><span>Total mensual</span><strong>${fmt(c.totC)}</strong></div>`;
+  }
+
+  document.getElementById('result-content').innerHTML = `
+    <div style="background:#f5f4f2;border-radius:14px;padding:22px 24px;text-align:center;margin-bottom:24px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#146787;margin-bottom:8px">Tu estimado está listo</div>
+      <div style="font-size:17px;font-weight:700;color:#1B1B1B;margin-bottom:6px">Revisa los datos y envía para recibir el pricing completo</div>
+      <div style="font-size:12px;color:#999;line-height:1.6">El detalle de precios y la cotización para el cliente<br>llegarán a tu correo en segundos.</div>
+    </div>
+
+    <div class="section-lbl">Pricing</div>
+    ${pricingBlock}
+
+    <div class="section-lbl" style="margin-top:20px">Resumen de la oportunidad</div>
+    <div class="summary-row"><span>Empresa</span><strong>${document.getElementById('f-empresa').value.trim() || '—'}</strong></div>
+    <div class="summary-row"><span>Solicitante</span><strong>${document.getElementById('f-solicitante').value.trim() || '—'}</strong></div>
+    <div class="summary-row"><span>Edición</span><strong>${S.ed === 'perf' ? 'Apprecio Performance' : 'Apprecio Beat'}</strong></div>
+    <div class="summary-row"><span>Tier comercial</span><strong>${t.label} — ${t.range}</strong></div>
+    <div class="summary-row"><span>Usuarios iniciales</span><strong>${c.ui.toLocaleString()}</strong></div>
+    <div class="summary-row"><span>Usuarios proyectados</span><strong>${c.up > 0 ? c.up.toLocaleString() : 'No indicado'}</strong></div>
+    <div class="summary-row"><span>Países</span><strong>${paisLabel}</strong></div>
+
+    <div class="section-lbl">Condiciones comerciales</div>
+    <div class="summary-row"><span>Tipo de pricing</span><strong>${isCustom ? '⚠️ Personalizado (requiere aprobación PM)' : '⚡ Automático estándar'}</strong></div>
+    <div class="summary-row"><span>Ya es cliente Apprecio</span><strong>${S.yac === 'si' ? 'Sí' : 'No'}</strong></div>
+    <div class="summary-row"><span>Migración desde otro SaaS</span><strong>${S.mig === 'si' ? (plataforma ? 'Sí — ' + plataforma : 'Sí') : 'No'}</strong></div>
+    <div class="summary-row"><span>Cross-sell</span><strong>${S.yac === 'si' && S.cross === 'si' ? 'Sí' : 'No'}</strong></div>
+    <div class="summary-row"><span>Piloto</span><strong>${S.pil === 'si' ? 'Sí — máximo 3 meses' : 'No'}</strong></div>
+    <div class="summary-row"><span>Add-ons</span><strong>${S.ao === '0' ? 'Ninguno' : S.ao === '1' ? '1 add-on' : '2 o más'}</strong></div>
+    <div class="summary-row"><span>Presupuesto en puntos</span><strong>${c.puntos > 0 ? fmt(c.puntos) + ' USD/mes' : 'No indicado'}</strong></div>
+    <div class="summary-row"><span>Expansión potencial</span><strong>${S.exp === 'si' && area ? area : 'No'}</strong></div>
+    ${comentarios ? `<div class="summary-row"><span>Comentarios</span><strong style="max-width:320px;text-align:right;line-height:1.4">${comentarios}</strong></div>` : ''}
+  `;
+}
+
+async function submitForm() {
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  const c = calcPricing();
+  const empresa     = document.getElementById('f-empresa').value.trim() || 'Sin nombre';
+  const solicitante = document.getElementById('f-solicitante').value.trim();
+  const email       = document.getElementById('f-email').value.trim();
+  const plataforma  = document.getElementById('f-plataforma').value.trim();
+  const area        = document.getElementById('f-area').value;
+  const isCustom    = S.pricingType === 'custom';
+  const comentarios = isCustom
+    ? document.getElementById('f-comentarios-custom').value.trim()
+    : document.getElementById('f-comentarios-auto').value.trim();
+
+  let nivelAprobacion;
+  if (isCustom) {
+    nivelAprobacion = 'Requiere aprobación Product Manager Comercial';
+  } else {
+    if (c.dtot <= 10) nivelAprobacion = 'Sin aprobación adicional';
+    else if (c.dtot <= 20) nivelAprobacion = 'Requiere aprobación PM Comercial SaaS';
+    else nivelAprobacion = 'Requiere aprobación Director Comercial SaaS';
+  }
+
+  let customPricingData = {};
+  if (isCustom) {
+    if (S.ctype === 'tramos') {
+      customPricingData = {
+        estructura: 'tramos',
+        tramos: tramos.filter(t => t.desde !== '' && t.hasta !== '' && t.precio !== ''),
+        tramos_texto: tramos.filter(t => t.desde && t.hasta && t.precio)
+          .map(t => `${t.desde}-${t.hasta} usuarios: USD ${t.precio}`)
+          .join(' | ')
+      };
+    } else {
+      const precioUnico = parseFloat(document.getElementById('f-precio-unico').value) || 0;
+      customPricingData = {
+        estructura: 'monto_unico',
+        precio_por_usuario: precioUnico,
+        total_mensual_estimado: Math.round(precioUnico * c.ui)
+      };
+    }
+  }
+
+  const payload = {
+    empresa, solicitante, email,
+    edicion: S.ed === 'perf' ? 'Apprecio Performance' : 'Apprecio Beat',
+    tipo_pricing: isCustom ? 'personalizado' : 'automatico',
+    ...(isCustom ? { pricing_personalizado: customPricingData } : {}),
+    pxu: c.pxu,
+    usuarios_iniciales: c.ui,
+    usuarios_proyectados: c.up,
+    paises: S.p,
+    tier: TIERS[S.ed][S.tier].label,
+    ya_cliente: S.yac === 'si' ? 'Sí' : 'No',
+    migracion: S.mig === 'si' ? 'Sí' : 'No',
+    plataforma_origen: plataforma || '—',
+    crosssell: S.yac === 'si' && S.cross === 'si' ? 'Sí' : 'No',
+    piloto: S.pil === 'si' ? 'Sí' : 'No',
+    puntos_mensual: c.puntos,
+    addons: S.ao,
+    expansion: S.exp === 'si' ? 'Sí' : 'No',
+    area_expansion: area || '—',
+    comentarios_adicionales: comentarios || '—',
+    fee_base: Math.round(c.fee),
+    descuento_tier: c.td,
+    descuento_paises: c.dp,
+    descuento_migracion: c.dm,
+    descuento_piloto: c.dpil,
+    descuento_crosssell: c.dc,
+    descuento_bundle: c.db,
+    descuento_total: c.dtot,
+    total_contrato: Math.round(c.totC),
+    pemp: c.pemp.toFixed(2),
+    multiplicador_puntos: c.mult.toFixed(2),
+    descuento_puntos: c.dpts,
+    total_puntos: Math.round(c.totP),
+    nivel_aprobacion: nivelAprobacion
+  };
+
+  try {
+    const WEBHOOK_URL = 'https://n8n.openip.cl/webhook/apprecio-pricing';
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    console.warn('Webhook error:', e);
+  }
+
+  document.getElementById('step-4').style.display = 'none';
+  document.getElementById('steps-bar').style.display = 'none';
+  document.getElementById('success').style.display = 'block';
+}
+
+renderTiers();
+renderTramosTable();
+</script>
+</body>
+</html>
