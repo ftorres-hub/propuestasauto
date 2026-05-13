@@ -491,7 +491,7 @@
       <label class="field-label">Edición</label>
       <div class="pill-group" id="g-ed">
         <div class="pill on" data-v="teams" onclick="pill('ed',this);renderTiers()">Apprecio Beat — USD 4/usuario</div>
-        <div class="pill" data-v="perf" onclick="pill('ed',this);renderTiers()">Apprecio Performance — USD 6/usuario</div>
+        <div class="pill" data-v="perf" onclick="pill('ed',this);renderTiers()">Beat Performance — USD 6/usuario</div>
       </div>
     </div>
 
@@ -857,7 +857,7 @@ function buildResult() {
     <div class="section-lbl" style="margin-top:20px">Resumen de la oportunidad</div>
     <div class="summary-row"><span>Empresa</span><strong>${document.getElementById('f-empresa').value.trim() || '—'}</strong></div>
     <div class="summary-row"><span>Solicitante</span><strong>${document.getElementById('f-solicitante').value.trim() || '—'}</strong></div>
-    <div class="summary-row"><span>Edición</span><strong>${S.ed === 'perf' ? 'Apprecio Performance' : 'Apprecio Beat'}</strong></div>
+    <div class="summary-row"><span>Edición</span><strong>${S.ed === 'perf' ? 'Beat Performance' : 'Apprecio Beat'}</strong></div>
     <div class="summary-row"><span>Tier comercial</span><strong>${t.label} — ${t.range}</strong></div>
     <div class="summary-row"><span>Usuarios iniciales</span><strong>${c.ui.toLocaleString()}</strong></div>
     <div class="summary-row"><span>Usuarios proyectados</span><strong>${c.up > 0 ? c.up.toLocaleString() : 'No indicado'}</strong></div>
@@ -923,7 +923,7 @@ async function submitForm() {
 
   const payload = {
     empresa, solicitante, email,
-    edicion: S.ed === 'perf' ? 'Apprecio Performance' : 'Apprecio Beat',
+    edicion: S.ed === 'perf' ? 'Beat Performance' : 'Apprecio Beat',
     tipo_pricing: isCustom ? 'personalizado' : 'automatico',
     ...(isCustom ? { pricing_personalizado: customPricingData } : {}),
     pxu: c.pxu,

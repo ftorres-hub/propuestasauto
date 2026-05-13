@@ -139,7 +139,7 @@ textarea { resize: vertical; min-height: 72px; }
         </div>
         <div class="prod-card" id="prod_perf" onclick="selectProd('performance')">
           <div class="prod-badge perf">Desempeño e incentivos</div>
-          <div class="prod-name">Apprecio Performance</div>
+          <div class="prod-name">Beat Performance</div>
           <div class="prod-desc">Gestiona metas comerciales, incentivos variables y rankings de desempeño para equipos de ventas y operaciones.</div>
         </div>
       </div>
@@ -362,7 +362,7 @@ let cur = 1;
 let producto = 'Apprecio Beat';
 
 function selectProd(p) {
-  producto = p === 'teams' ? 'Apprecio Beat' : 'Apprecio Performance';
+  producto = p === 'teams' ? 'Apprecio Beat' : 'Beat Performance';
   document.getElementById('prod_teams').classList.toggle('sel', p === 'teams');
   document.getElementById('prod_perf').classList.toggle('sel', p === 'performance');
   updateStep4();
